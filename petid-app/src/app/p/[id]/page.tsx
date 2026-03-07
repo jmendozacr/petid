@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { QRCode } from '@/components/qr-code'
+import { Button } from '@/components/ui/button'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -133,6 +135,12 @@ export default async function PublicPetPage({ params }: PageProps) {
             </CardContent>
           </Card>
         )}
+
+        <Button asChild className="w-full" variant="outline">
+          <Link href={`/p/${pet.id}/report`}>
+            📍 Report Found Pet
+          </Link>
+        </Button>
 
         <p className="text-center text-sm text-muted-foreground">
           Powered by PetID
