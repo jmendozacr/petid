@@ -1,28 +1,32 @@
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="text-center max-w-md">
-        <h1 className="text-4xl font-bold mb-4">PetID</h1>
-        <p className="text-gray-600 mb-8">
-          Digital identity and health record for your pets
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Link
-            href="/login"
-            className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/signup"
-            className="px-6 py-2 border border-black rounded-md hover:bg-gray-100"
-          >
-            Sign Up
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md text-center">
+        <CardHeader className="space-y-4">
+          <h1 className="text-4xl font-bold text-primary">PetID</h1>
+          <CardDescription className="text-base">
+            Digital identity and health record for your pets
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button asChild size="lg">
+              <Link href="/login">Sign In</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/signup">Sign Up</Link>
+            </Button>
+          </div>
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p>Keep your pet's information safe and accessible</p>
+            <p>Generate QR codes for easy identification</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

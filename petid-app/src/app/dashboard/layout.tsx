@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 export default async function DashboardLayout({
   children,
@@ -23,19 +24,19 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm" role="banner">
+    <div className="min-h-screen bg-background">
+      <header className="border-b bg-card shadow-sm" role="banner">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/dashboard" className="text-xl font-bold">
+          <Link href="/dashboard" className="text-xl font-bold text-primary">
             PetID
           </Link>
           <nav aria-label="Main navigation">
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">{user.email}</span>
+              <span className="text-sm text-muted-foreground">{user.email}</span>
               <form action={handleSignOut}>
-                <button type="submit" className="text-sm text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-black">
+                <Button type="submit" variant="ghost" size="sm">
                   Sign Out
-                </button>
+                </Button>
               </form>
             </div>
           </nav>
