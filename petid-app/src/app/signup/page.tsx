@@ -39,7 +39,7 @@ export default function SignupPage() {
         <h1 className="text-2xl font-bold text-center mb-6">Create Account</h1>
         
         {success ? (
-          <div className="text-center">
+          <div role="alert" aria-live="polite" className="text-center">
             <p className="text-green-600 mb-4">
               Check your email for the confirmation link!
             </p>
@@ -48,32 +48,40 @@ export default function SignupPage() {
             </a>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+                aria-required="true"
+                aria-invalid={!!error}
+                aria-describedby="email-error"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
               <input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+                aria-required="true"
+                aria-invalid={!!error}
+                aria-describedby="password-error"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
               />
             </div>
 
             {error && (
-              <div className="text-red-600 text-sm">{error}</div>
+              <div id="email-error" role="alert" aria-live="assertive" className="text-red-600 text-sm">{error}</div>
             )}
 
             <button

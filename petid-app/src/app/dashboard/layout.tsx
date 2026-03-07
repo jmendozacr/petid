@@ -24,22 +24,24 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm" role="banner">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/dashboard" className="text-xl font-bold">
             PetID
           </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{user.email}</span>
-            <form action={handleSignOut}>
-              <button className="text-sm text-gray-600 hover:text-black">
-                Sign Out
-              </button>
-            </form>
-          </div>
+          <nav aria-label="Main navigation">
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">{user.email}</span>
+              <form action={handleSignOut}>
+                <button type="submit" className="text-sm text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-black">
+                  Sign Out
+                </button>
+              </form>
+            </div>
+          </nav>
         </div>
       </header>
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 py-8" role="main">
         {children}
       </main>
     </div>
