@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { QRCode, getPublicPetUrl } from '@/components/qr-code'
 import type { Pet } from '@/types/pet'
 import type { HealthRecord } from '@/types/health-record'
 
@@ -169,6 +170,27 @@ export default function PetDetailPage() {
               </div>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">QR Code</CardTitle>
+          <CardDescription>Scan this to view pet info publicly</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center">
+          <QRCode value={getPublicPetUrl(petId)} size={200} className="mb-4" />
+          <p className="text-sm text-muted-foreground text-center">
+            {getPublicPetUrl(petId)}
+          </p>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="mt-4"
+            onClick={() => navigator.clipboard.writeText(getPublicPetUrl(petId))}
+          >
+            Copy Link
+          </Button>
         </CardContent>
       </Card>
 
