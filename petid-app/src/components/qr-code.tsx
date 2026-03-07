@@ -1,3 +1,6 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import QRCodeLib from 'qrcode'
 
 interface QRCodeProps {
@@ -6,15 +9,27 @@ interface QRCodeProps {
   className?: string
 }
 
-export async function QRCode({ value, size = 200, className }: QRCodeProps) {
-  const dataUrl = await QRCodeLib.toDataURL(value, {
-    width: size,
-    margin: 2,
-    color: {
-      dark: '#000000',
-      light: '#ffffff',
-    },
-  })
+export function QRCode({ value, size = 200, className }: QRCodeProps) {
+  const [dataUrl, setDataUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function generateQR() {
+      const url = await QRCodeLib.toDataURL(value, {
+        width: size,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#ffffff',
+        },
+      })
+      setDataUrl(url)
+    }
+    generateQR()
+  }, [value, size])
+
+  if (!dataUrl) {
+    return <div className={`bg-muted ${className}`} style={{ width: size, height: size }} />
+  }
 
   return (
     <img
