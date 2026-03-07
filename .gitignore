@@ -13,3 +13,6 @@ skills-lock.json
 .idea/
 *.swp
 *.swo
+
+# Test/Dev files
+petid-app/src/app/test/
