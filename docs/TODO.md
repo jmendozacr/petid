@@ -1,34 +1,34 @@
 # PetID - Pending Tasks
 
 ## Database
-- [ ] Re-configure foreign key constraint between pets and profiles with proper trigger
-- [ ] Add trigger to auto-create profile when user signs up
+- [x] Re-configure foreign key constraint between pets and profiles with proper trigger
+- [x] Add trigger to auto-create profile when user signs up
 
 ## Testing
-- [ ] Set up unit testing framework (Vitest + React Testing Library)
-- [ ] Add tests for Zustand store
+- [x] Set up unit testing framework (Vitest + React Testing Library)
+- [x] Add tests for Zustand store
 - [ ] Add tests for Pet CRUD components
 
 ## Phase 5 - Health Records
-- [ ] Add vaccine record
-- [ ] Add allergy record
-- [ ] Add medical note
+- [x] Add vaccine record
+- [x] Add allergy record
+- [x] Add medical note
 
 ## Phase 6 - QR Code
-- [ ] Generate QR code per pet
-- [ ] Store public URL
-- [ ] Display QR in dashboard
+- [x] Generate QR code per pet
+- [x] Store public URL
+- [x] Display QR in dashboard
 
 ## Phase 7 - Public Pet Page
-- [ ] Create route /p/[petId]
-- [ ] Show pet photo, name, breed, allergies, emergency contact
+- [x] Create route /p/[petId]
+- [x] Show pet photo, name, breed, allergies, emergency contact
 
 ## Phase 8 - Found Pet Reports
-- [ ] Create route /p/[petId]/report
-- [ ] Form with message, photo, location
-- [ ] Store report in database
+- [x] Create route /p/[petId]/report
+- [x] Form with message, photo, location
+- [x] Store report in database
 
 ## Phase 9 - Deploy
-- [ ] Deploy frontend to Vercel
-- [ ] Connect Supabase
+- [x] Deploy frontend to Vercel
+- [x] Connect Supabase
 - [ ] Configure domain petid.app

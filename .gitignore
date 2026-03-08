@@ -16,3 +16,5 @@ skills-lock.json
 
 # Test/Dev files
 petid-app/src/app/test/
+
+.vercel
