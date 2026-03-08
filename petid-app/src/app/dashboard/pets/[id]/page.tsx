@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { QRCode, getPublicPetUrl } from '@/components/qr-code'
+import { getPetById, updatePet, deletePet } from '@/services/pets-service'
+import { getHealthRecords, createHealthRecord, deleteHealthRecord } from '@/services/health-record-service'
 import type { Pet } from '@/types/pet'
 import type { HealthRecord } from '@/types/health-record'
 
@@ -15,7 +16,6 @@ export default function PetDetailPage() {
   const params = useParams()
   const router = useRouter()
   const petId = params.id as string
-  const supabase = createClient()
   
   const [pet, setPet] = useState<Pet | null>(null)
   const [records, setRecords] = useState<HealthRecord[]>([])
@@ -27,74 +27,55 @@ export default function PetDetailPage() {
     record_date: new Date().toISOString().split('T')[0],
   })
 
-  useEffect(() => {
-    async function fetchData() {
-      const { data: petData } = await supabase
-        .from('pets')
-        .select('*')
-        .eq('id', petId)
-        .single()
-
-      if (petData) {
-        setPet(petData)
-      }
-
-      const { data: recordsData } = await supabase
-        .from('health_records')
-        .select('*')
-        .eq('pet_id', petId)
-        .order('record_date', { ascending: false })
-
-      if (recordsData) {
-        setRecords(recordsData)
-      }
-
+  const loadData = useCallback(async () => {
+    try {
+      const [petData, recordsData] = await Promise.all([
+        getPetById(petId),
+        getHealthRecords(petId)
+      ])
+      setPet(petData)
+      setRecords(recordsData)
+    } catch (error) {
+      console.error('Failed to load data:', error)
+    } finally {
       setLoading(false)
     }
-
-    fetchData()
   }, [petId])
 
-  async function handleAddRecord(e: React.FormEvent) {
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  const handleAddRecord = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     
-    const { data, error } = await supabase
-      .from('health_records')
-      .insert({
+    try {
+      const data = await createHealthRecord({
         pet_id: petId,
         type: newRecord.type,
         description: newRecord.description,
         record_date: newRecord.record_date,
       })
-      .select()
-      .single()
-
-    if (error) {
-      alert(error.message)
-      return
-    }
-
-    if (data) {
-      setRecords([data, ...records])
+      setRecords(prev => [data, ...prev])
       setShowAddRecord(false)
       setNewRecord({
         type: 'vaccine',
         description: '',
         record_date: new Date().toISOString().split('T')[0],
       })
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to add record')
     }
-  }
+  }, [petId, newRecord])
 
-  async function handleDeleteRecord(id: string) {
-    const { error } = await supabase
-      .from('health_records')
-      .delete()
-      .eq('id', id)
-
-    if (!error) {
-      setRecords(records.filter(r => r.id !== id))
+  const handleDeleteRecord = useCallback(async (id: string) => {
+    try {
+      await deleteHealthRecord(id)
+      setRecords(prev => prev.filter(r => r.id !== id))
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to delete record')
     }
-  }
+  }, [])
 
   if (loading) {
     return (
@@ -212,7 +193,7 @@ export default function PetDetailPage() {
                 <Label>Type</Label>
                 <select
                   value={newRecord.type}
-                  onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value as any })}
+                  onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value as 'vaccine' | 'allergy' | 'medical_note' })}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                   <option value="vaccine">Vaccine</option>

@@ -1,49 +1,35 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { usePetStore } from '@/stores/pet-store'
+import { getPets } from '@/services/pets-service'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function DashboardPage() {
   const pets = usePetStore((state) => state.pets)
   const isLoading = usePetStore((state) => state.isLoading)
+  const error = usePetStore((state) => state.error)
   const setPets = usePetStore((state) => state.setPets)
   const setLoading = usePetStore((state) => state.setLoading)
   const setError = usePetStore((state) => state.setError)
-  const supabase = createClient()
 
-  useEffect(() => {
-    async function fetchPets() {
-      setLoading(true)
-      
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        setError('You must be logged in')
-        setLoading(false)
-        return
-      }
-
-      const { data, error } = await supabase
-        .from('pets')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        setError(error.message)
-      } else {
-        setPets(data as typeof pets)
-      }
-      
+  const loadPets = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await getPets()
+      setPets(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load pets')
+    } finally {
       setLoading(false)
     }
+  }, [setPets, setLoading, setError])
 
-    fetchPets()
-  }, [])
+  useEffect(() => {
+    loadPets()
+  }, [loadPets])
 
   return (
     <div className="space-y-6">
@@ -58,6 +44,12 @@ export default function DashboardPage() {
         <Card>
           <CardContent className="flex items-center justify-center py-12">
             <p className="text-muted-foreground">Loading...</p>
+          </CardContent>
+        </Card>
+      ) : error ? (
+        <Card className="border-danger bg-danger/10">
+          <CardContent className="py-4">
+            <p className="text-danger text-center">{error}</p>
           </CardContent>
         </Card>
       ) : pets.length === 0 ? (

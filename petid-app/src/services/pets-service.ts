@@ -1,36 +1,45 @@
 import { createClient } from '@/lib/supabase/client'
-import { usePetStore } from '@/stores/pet-store'
 import type { Pet } from '@/types/pet'
 
-export async function fetchPets() {
+export async function getPets(): Promise<Pet[]> {
   const supabase = createClient()
-  const setPets = usePetStore.getState().setPets
-  const setLoading = usePetStore.getState().setLoading
-  const setError = usePetStore.getState().setError
-
-  setLoading(true)
   
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('You must be logged in')
+  }
+
   const { data, error } = await supabase
     .from('pets')
     .select('*')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   if (error) {
-    setError(error.message)
-  } else {
-    setPets(data as Pet[])
+    throw new Error(error.message)
   }
-  
-  setLoading(false)
+
+  return data as Pet[]
 }
 
-export async function createPet(petData: Partial<Pet>): Promise<Pet | null> {
+export async function getPetById(id: string): Promise<Pet | null> {
   const supabase = createClient()
-  const addPet = usePetStore.getState().addPet
-  const setLoading = usePetStore.getState().setLoading
-  const setError = usePetStore.getState().setError
 
-  setLoading(true)
+  const { data, error } = await supabase
+    .from('pets')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    return null
+  }
+
+  return data as Pet
+}
+
+export async function createPet(petData: Partial<Pet>): Promise<Pet> {
+  const supabase = createClient()
 
   const { data, error } = await supabase
     .from('pets')
@@ -39,23 +48,14 @@ export async function createPet(petData: Partial<Pet>): Promise<Pet | null> {
     .single()
 
   if (error) {
-    setError(error.message)
-    setLoading(false)
-    return null
+    throw new Error(error.message)
   }
 
-  addPet(data as Pet)
-  setLoading(false)
   return data as Pet
 }
 
-export async function updatePet(id: string, petData: Partial<Pet>): Promise<Pet | null> {
+export async function updatePet(id: string, petData: Partial<Pet>): Promise<Pet> {
   const supabase = createClient()
-  const updatePet = usePetStore.getState().updatePet
-  const setLoading = usePetStore.getState().setLoading
-  const setError = usePetStore.getState().setError
-
-  setLoading(true)
 
   const { data, error } = await supabase
     .from('pets')
@@ -65,23 +65,14 @@ export async function updatePet(id: string, petData: Partial<Pet>): Promise<Pet 
     .single()
 
   if (error) {
-    setError(error.message)
-    setLoading(false)
-    return null
+    throw new Error(error.message)
   }
 
-  updatePet(data as Pet)
-  setLoading(false)
   return data as Pet
 }
 
-export async function deletePet(id: string): Promise<boolean> {
+export async function deletePet(id: string): Promise<void> {
   const supabase = createClient()
-  const removePet = usePetStore.getState().removePet
-  const setLoading = usePetStore.getState().setLoading
-  const setError = usePetStore.getState().setError
-
-  setLoading(true)
 
   const { error } = await supabase
     .from('pets')
@@ -89,17 +80,11 @@ export async function deletePet(id: string): Promise<boolean> {
     .eq('id', id)
 
   if (error) {
-    setError(error.message)
-    setLoading(false)
-    return false
+    throw new Error(error.message)
   }
-
-  removePet(id)
-  setLoading(false)
-  return true
 }
 
-export async function uploadPetPhoto(petId: string, file: File): Promise<string | null> {
+export async function uploadPetPhoto(petId: string, file: File): Promise<string> {
   const supabase = createClient()
   const filePath = `pets/${petId}/${file.name}`
 
@@ -108,7 +93,7 @@ export async function uploadPetPhoto(petId: string, file: File): Promise<string 
     .upload(filePath, file, { upsert: true })
 
   if (uploadError) {
-    return null
+    throw new Error(uploadError.message)
   }
 
   const { data: { publicUrl } } = supabase.storage

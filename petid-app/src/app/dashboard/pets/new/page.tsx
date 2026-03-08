@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
+import { createPet } from '@/services/pets-service'
 
 export default function NewPetPage() {
   const [formData, setFormData] = useState({
@@ -23,46 +23,36 @@ export default function NewPetPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const supabase = createClient()
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-      setError('You must be logged in')
+    try {
+      const petData = {
+        name: formData.name,
+        species: formData.species || null,
+        breed: formData.breed || null,
+        birthdate: formData.birthdate || null,
+        color: formData.color || null,
+        weight: formData.weight ? parseFloat(formData.weight) : null,
+        microchip_id: formData.microchip_id || null,
+        owner_phone: formData.owner_phone || null,
+        emergency_contact: formData.emergency_contact || null,
+      }
+
+      await createPet(petData)
+      router.push('/dashboard')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create pet')
       setLoading(false)
-      return
     }
+  }, [formData, router])
 
-    const petData = {
-      user_id: user.id,
-      name: formData.name,
-      species: formData.species || null,
-      breed: formData.breed || null,
-      birthdate: formData.birthdate || null,
-      color: formData.color || null,
-      weight: formData.weight ? parseFloat(formData.weight) : null,
-      microchip_id: formData.microchip_id || null,
-      owner_phone: formData.owner_phone || null,
-      emergency_contact: formData.emergency_contact || null,
-    }
-
-    const { error: insertError } = await supabase
-      .from('pets')
-      .insert(petData)
-
-    if (insertError) {
-      setError(insertError.message)
-      setLoading(false)
-      return
-    }
-
-    router.push('/dashboard')
-  }
+  const handleChange = useCallback((field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }, [])
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -84,7 +74,7 @@ export default function NewPetPage() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => handleChange('name', e.target.value)}
                 required
                 placeholder="Your pet's name"
               />
@@ -96,7 +86,7 @@ export default function NewPetPage() {
                 <Input
                   id="species"
                   value={formData.species}
-                  onChange={(e) => setFormData({ ...formData, species: e.target.value })}
+                  onChange={(e) => handleChange('species', e.target.value)}
                   placeholder="Dog, Cat, Bird..."
                 />
               </div>
@@ -106,7 +96,7 @@ export default function NewPetPage() {
                 <Input
                   id="breed"
                   value={formData.breed}
-                  onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+                  onChange={(e) => handleChange('breed', e.target.value)}
                   placeholder="Golden Retriever..."
                 />
               </div>
@@ -119,7 +109,7 @@ export default function NewPetPage() {
                   id="birthdate"
                   type="date"
                   value={formData.birthdate}
-                  onChange={(e) => setFormData({ ...formData, birthdate: e.target.value })}
+                  onChange={(e) => handleChange('birthdate', e.target.value)}
                 />
               </div>
 
@@ -128,7 +118,7 @@ export default function NewPetPage() {
                 <Input
                   id="color"
                   value={formData.color}
-                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                  onChange={(e) => handleChange('color', e.target.value)}
                   placeholder="Brown, White..."
                 />
               </div>
@@ -142,7 +132,7 @@ export default function NewPetPage() {
                   type="number"
                   step="0.1"
                   value={formData.weight}
-                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  onChange={(e) => handleChange('weight', e.target.value)}
                   placeholder="10.5"
                 />
               </div>
@@ -152,7 +142,7 @@ export default function NewPetPage() {
                 <Input
                   id="microchip_id"
                   value={formData.microchip_id}
-                  onChange={(e) => setFormData({ ...formData, microchip_id: e.target.value })}
+                  onChange={(e) => handleChange('microchip_id', e.target.value)}
                   placeholder="ABC123..."
                 />
               </div>
@@ -165,7 +155,7 @@ export default function NewPetPage() {
                   id="owner_phone"
                   type="tel"
                   value={formData.owner_phone}
-                  onChange={(e) => setFormData({ ...formData, owner_phone: e.target.value })}
+                  onChange={(e) => handleChange('owner_phone', e.target.value)}
                   placeholder="+1 234 567 8900"
                 />
               </div>
@@ -175,7 +165,7 @@ export default function NewPetPage() {
                 <Input
                   id="emergency_contact"
                   value={formData.emergency_contact}
-                  onChange={(e) => setFormData({ ...formData, emergency_contact: e.target.value })}
+                  onChange={(e) => handleChange('emergency_contact', e.target.value)}
                   placeholder="Vet's phone..."
                 />
               </div>
