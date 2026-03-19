@@ -1,50 +1,37 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { usePet } from '@/hooks/usePet'
+import { DeleteConfirmModal } from '@/components/pet/DeleteConfirmModal'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { getPetById, deletePet } from '@/services/pets-service'
+import { Card, CardContent } from '@/components/ui/card'
 
 export default function DeletePetPage() {
-  const params = useParams()
   const router = useRouter()
-  const petId = params.id as string
-
-  const [petName, setPetName] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { pet, loading, error, remove } = usePet('')
   const [deleting, setDeleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+
+  const petId = typeof window !== 'undefined' 
+    ? new URLSearchParams(window.location.search).get('petId') || ''
+    : ''
 
   useEffect(() => {
-    async function loadPet() {
-      try {
-        const pet = await getPetById(petId)
-        if (pet) {
-          setPetName(pet.name)
-        } else {
-          setError('Pet not found')
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load pet')
-      } finally {
-        setLoading(false)
-      }
+    if (!petId && !loading) {
+      router.push('/dashboard')
     }
-    loadPet()
-  }, [petId])
+  }, [petId, loading, router])
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = async () => {
     setDeleting(true)
-    setError(null)
     try {
-      await deletePet(petId)
+      await remove()
       router.push('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete pet')
+      alert(err instanceof Error ? err.message : 'Failed to delete pet')
       setDeleting(false)
     }
-  }, [petId, router])
+  }
 
   if (loading) {
     return (
@@ -54,12 +41,12 @@ export default function DeletePetPage() {
     )
   }
 
-  if (error && !petName) {
+  if (error || !pet) {
     return (
       <div className="max-w-md mx-auto mt-8">
         <Card className="border-danger">
           <CardContent className="py-6 text-center">
-            <p className="text-danger">{error}</p>
+            <p className="text-danger">{error || 'Pet not found'}</p>
             <Button onClick={() => router.push('/dashboard')} className="mt-4">
               Back to Dashboard
             </Button>
@@ -70,40 +57,13 @@ export default function DeletePetPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Delete Pet</CardTitle>
-          <CardDescription>
-            Are you sure you want to delete {petName}? This action cannot be undone.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <div role="alert" className="text-sm text-danger p-3 rounded-md bg-danger/10">
-              {error}
-            </div>
-          )}
-          <div className="flex gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => router.back()}
-              disabled={deleting}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleDelete}
-              disabled={deleting}
-              className="flex-1"
-            >
-              {deleting ? 'Deleting...' : 'Delete'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <DeleteConfirmModal
+      isOpen={true}
+      title="Delete Pet"
+      itemName={pet.name}
+      loading={deleting}
+      onCancel={() => router.back()}
+      onConfirm={handleDelete}
+    />
   )
 }

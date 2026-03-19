@@ -1,36 +1,29 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 
 export default function LoginPage() {
+  const router = useRouter()
+  const { loading, error, signIn, clearError } = useAuth()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const supabase = createClient()
 
-  async function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    return () => clearError()
+  }, [clearError])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
-    setLoading(true)
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
+    const { user } = await signIn(email, password)
+    if (user) {
       router.push('/dashboard')
     }
   }
@@ -84,7 +77,7 @@ export default function LoginPage() {
               {loading ? 'Loading...' : 'Sign In'}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/signup" className="text-primary hover:underline">
                 Sign up
               </Link>

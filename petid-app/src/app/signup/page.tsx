@@ -1,40 +1,29 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import Link from 'next/link'
 
 export default function SignupPage() {
+  const { loading, error, signUp, clearError } = useAuth()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const router = useRouter()
-  const supabase = createClient()
 
-  async function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    return () => clearError()
+  }, [clearError])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
-    setSuccess(false)
-    setLoading(true)
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
+    const result = await signUp(email, password)
+    if (result.success) {
       setSuccess(true)
-      setLoading(false)
     }
   }
 

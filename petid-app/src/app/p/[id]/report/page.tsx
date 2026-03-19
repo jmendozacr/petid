@@ -1,50 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { useReportForm } from '@/hooks/useReportForm'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ReportFoundPetPage() {
   const params = useParams()
   const router = useRouter()
   const petId = params.id as string
-  const supabase = createClient()
 
-  const [formData, setFormData] = useState({
-    message: '',
-    location: '',
-    contact: '',
-  })
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { formData, loading, success, error, handleChange, submit } = useReportForm(petId)
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    const { error: insertError } = await supabase
-      .from('found_reports')
-      .insert({
-        pet_id: petId,
-        message: formData.message,
-        location: formData.location,
-      })
-
-    if (insertError) {
-      setError(insertError.message)
-      setLoading(false)
-      return
-    }
-
-    setSuccess(true)
-    setLoading(false)
-  }
+    await submit()
+  }, [submit])
 
   if (success) {
     return (
@@ -93,7 +67,7 @@ export default function ReportFoundPetPage() {
                 <textarea
                   id="message"
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={(e) => handleChange('message', e.target.value)}
                   placeholder="Where did you find the pet? Any details..."
                   className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   required
@@ -105,7 +79,7 @@ export default function ReportFoundPetPage() {
                 <Input
                   id="location"
                   value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  onChange={(e) => handleChange('location', e.target.value)}
                   placeholder="Street, neighborhood, city..."
                 />
               </div>
@@ -116,7 +90,7 @@ export default function ReportFoundPetPage() {
                   id="contact"
                   type="tel"
                   value={formData.contact}
-                  onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+                  onChange={(e) => handleChange('contact', e.target.value)}
                   placeholder="Phone or email..."
                 />
               </div>

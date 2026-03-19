@@ -2,95 +2,54 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { usePet } from '@/hooks/usePet'
+import { useHealthRecords } from '@/hooks/useHealthRecords'
+import { DeleteConfirmModal } from '@/components/pet/DeleteConfirmModal'
+import { HealthRecordItem } from '@/components/health-record/HealthRecordItem'
+import { HealthRecordForm } from '@/components/health-record/HealthRecordForm'
 import { QRCode, getPublicPetUrl } from '@/components/qr-code'
-import { getPetById, updatePet, deletePet, uploadPetPhoto } from '@/services/pets-service'
-import { getHealthRecords, createHealthRecord, deleteHealthRecord } from '@/services/health-record-service'
-import type { Pet } from '@/types/pet'
-import type { HealthRecord } from '@/types/health-record'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function PetDetailPage() {
   const params = useParams()
   const router = useRouter()
   const petId = params.id as string
-  
-  const [pet, setPet] = useState<Pet | null>(null)
-  const [records, setRecords] = useState<HealthRecord[]>([])
-  const [loading, setLoading] = useState(true)
+
+  const { pet, loading: petLoading, error: petError, update, remove, uploadPhoto, reload } = usePet(petId)
+  const { vaccines, allergies, medicalNotes, add, remove: removeRecord, loading: recordsLoading } = useHealthRecords(petId)
+
   const [showAddRecord, setShowAddRecord] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
-  const [newRecord, setNewRecord] = useState({
-    type: 'vaccine' as 'vaccine' | 'allergy' | 'medical_note',
-    description: '',
-    record_date: new Date().toISOString().split('T')[0],
-  })
+  const [deletingRecordId, setDeletingRecordId] = useState<string | null>(null)
 
-  const loadData = useCallback(async () => {
-    try {
-      const [petData, recordsData] = await Promise.all([
-        getPetById(petId),
-        getHealthRecords(petId)
-      ])
-      setPet(petData)
-      setRecords(recordsData)
-    } catch (error) {
-      console.error('Failed to load data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [petId])
-
-  useEffect(() => {
-    loadData()
-  }, [loadData])
-
-  const handleAddRecord = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    try {
-      const data = await createHealthRecord({
-        pet_id: petId,
-        type: newRecord.type,
-        description: newRecord.description,
-        record_date: newRecord.record_date,
-      })
-      setRecords(prev => [data, ...prev])
-      setShowAddRecord(false)
-      setNewRecord({
-        type: 'vaccine',
-        description: '',
-        record_date: new Date().toISOString().split('T')[0],
-      })
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to add record')
-    }
-  }, [petId, newRecord])
+  const handleAddRecord = useCallback(async (data: { type: 'vaccine' | 'allergy' | 'medical_note'; description: string; record_date: string }) => {
+    await add(data)
+    setShowAddRecord(false)
+  }, [add])
 
   const handleDeleteRecord = useCallback(async (id: string) => {
+    setDeletingRecordId(id)
     try {
-      await deleteHealthRecord(id)
-      setRecords(prev => prev.filter(r => r.id !== id))
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to delete record')
+      await removeRecord(id)
+    } finally {
+      setDeletingRecordId(null)
     }
-  }, [])
+  }, [removeRecord])
 
   const handleDeletePet = useCallback(async () => {
     setDeleting(true)
     try {
-      await deletePet(petId)
+      await remove()
       router.push('/dashboard')
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Failed to delete pet')
       setDeleting(false)
       setShowDeleteModal(false)
     }
-  }, [petId, router])
+  }, [remove, router])
 
   const handlePhotoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -98,17 +57,15 @@ export default function PetDetailPage() {
 
     setUploadingPhoto(true)
     try {
-      const photoUrl = await uploadPetPhoto(petId, file)
-      await updatePet(petId, { photo_url: photoUrl })
-      setPet(prev => prev ? { ...prev, photo_url: photoUrl } : null)
+      await uploadPhoto(file)
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Failed to upload photo')
     } finally {
       setUploadingPhoto(false)
     }
-  }, [petId])
+  }, [uploadPhoto])
 
-  if (loading) {
+  if (petLoading || recordsLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <p className="text-muted-foreground">Loading...</p>
@@ -116,20 +73,16 @@ export default function PetDetailPage() {
     )
   }
 
-  if (!pet) {
+  if (petError || !pet) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Pet not found</p>
+        <p className="text-muted-foreground">{petError || 'Pet not found'}</p>
         <Button onClick={() => router.push('/dashboard')} className="mt-4">
           Back to Dashboard
         </Button>
       </div>
     )
   }
-
-  const vaccines = records.filter(r => r.type === 'vaccine')
-  const allergies = records.filter(r => r.type === 'allergy')
-  const medicalNotes = records.filter(r => r.type === 'medical_note')
 
   return (
     <div className="space-y-6">
@@ -191,39 +144,39 @@ export default function PetDetailPage() {
                 {pet.species} {pet.breed && `- ${pet.breed}`}
               </CardDescription>
               <div className="grid grid-cols-2 gap-4 text-sm">
-            {pet.birthdate && (
-              <div>
-                <span className="text-muted-foreground">Birthdate:</span> {pet.birthdate}
+                {pet.birthdate && (
+                  <div>
+                    <span className="text-muted-foreground">Birthdate:</span> {pet.birthdate}
+                  </div>
+                )}
+                {pet.color && (
+                  <div>
+                    <span className="text-muted-foreground">Color:</span> {pet.color}
+                  </div>
+                )}
+                {pet.weight && (
+                  <div>
+                    <span className="text-muted-foreground">Weight:</span> {pet.weight} kg
+                  </div>
+                )}
+                {pet.microchip_id && (
+                  <div>
+                    <span className="text-muted-foreground">Microchip:</span> {pet.microchip_id}
+                  </div>
+                )}
+                {pet.owner_phone && (
+                  <div>
+                    <span className="text-muted-foreground">Phone:</span> {pet.owner_phone}
+                  </div>
+                )}
+                {pet.emergency_contact && (
+                  <div>
+                    <span className="text-muted-foreground">Emergency:</span> {pet.emergency_contact}
+                  </div>
+                )}
               </div>
-            )}
-            {pet.color && (
-              <div>
-                <span className="text-muted-foreground">Color:</span> {pet.color}
-              </div>
-            )}
-            {pet.weight && (
-              <div>
-                <span className="text-muted-foreground">Weight:</span> {pet.weight} kg
-              </div>
-            )}
-            {pet.microchip_id && (
-              <div>
-                <span className="text-muted-foreground">Microchip:</span> {pet.microchip_id}
-              </div>
-            )}
-            {pet.owner_phone && (
-              <div>
-                <span className="text-muted-foreground">Phone:</span> {pet.owner_phone}
-              </div>
-            )}
-            {pet.emergency_contact && (
-              <div>
-                <span className="text-muted-foreground">Emergency:</span> {pet.emergency_contact}
-              </div>
-            )}
+            </div>
           </div>
-          </div>
-        </div>
         </CardContent>
       </Card>
 
@@ -256,48 +209,10 @@ export default function PetDetailPage() {
       </div>
 
       {showAddRecord && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Add Health Record</CardTitle>
-          </CardHeader>
-          <form onSubmit={handleAddRecord}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Type</Label>
-                <select
-                  value={newRecord.type}
-                  onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value as 'vaccine' | 'allergy' | 'medical_note' })}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                >
-                  <option value="vaccine">Vaccine</option>
-                  <option value="allergy">Allergy</option>
-                  <option value="medical_note">Medical Note</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label>Date</Label>
-                <Input
-                  type="date"
-                  value={newRecord.record_date}
-                  onChange={(e) => setNewRecord({ ...newRecord, record_date: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <textarea
-                  value={newRecord.description}
-                  onChange={(e) => setNewRecord({ ...newRecord, description: e.target.value })}
-                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder="Enter details..."
-                  required
-                />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button type="submit">Save Record</Button>
-            </CardFooter>
-          </form>
-        </Card>
+        <HealthRecordForm 
+          onSubmit={handleAddRecord} 
+          onCancel={() => setShowAddRecord(false)}
+        />
       )}
 
       {vaccines.length > 0 && (
@@ -307,15 +222,12 @@ export default function PetDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {vaccines.map((record) => (
-              <div key={record.id} className="flex items-start justify-between p-3 border rounded">
-                <div>
-                  <p className="font-medium">{record.description}</p>
-                  <p className="text-sm text-muted-foreground">{record.record_date}</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => handleDeleteRecord(record.id)}>
-                  Delete
-                </Button>
-              </div>
+              <HealthRecordItem 
+                key={record.id} 
+                record={record} 
+                onDelete={handleDeleteRecord}
+                isDeleting={deletingRecordId === record.id}
+              />
             ))}
           </CardContent>
         </Card>
@@ -328,15 +240,12 @@ export default function PetDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {allergies.map((record) => (
-              <div key={record.id} className="flex items-start justify-between p-3 border rounded">
-                <div>
-                  <p className="font-medium">{record.description}</p>
-                  <p className="text-sm text-muted-foreground">{record.record_date}</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => handleDeleteRecord(record.id)}>
-                  Delete
-                </Button>
-              </div>
+              <HealthRecordItem 
+                key={record.id} 
+                record={record} 
+                onDelete={handleDeleteRecord}
+                isDeleting={deletingRecordId === record.id}
+              />
             ))}
           </CardContent>
         </Card>
@@ -349,21 +258,18 @@ export default function PetDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {medicalNotes.map((record) => (
-              <div key={record.id} className="flex items-start justify-between p-3 border rounded">
-                <div>
-                  <p className="font-medium">{record.description}</p>
-                  <p className="text-sm text-muted-foreground">{record.record_date}</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => handleDeleteRecord(record.id)}>
-                  Delete
-                </Button>
-              </div>
+              <HealthRecordItem 
+                key={record.id} 
+                record={record} 
+                onDelete={handleDeleteRecord}
+                isDeleting={deletingRecordId === record.id}
+              />
             ))}
           </CardContent>
         </Card>
       )}
 
-      {records.length === 0 && (
+      {vaccines.length === 0 && allergies.length === 0 && medicalNotes.length === 0 && (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
             No health records yet
@@ -371,38 +277,14 @@ export default function PetDetailPage() {
         </Card>
       )}
 
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="max-w-md w-full">
-            <CardHeader>
-              <CardTitle>Delete Pet</CardTitle>
-              <CardDescription>
-                Are you sure you want to delete {pet?.name}? This action cannot be undone.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={deleting}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleDeletePet}
-                  disabled={deleting}
-                  className="flex-1"
-                >
-                  {deleting ? 'Deleting...' : 'Delete'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete Pet"
+        itemName={pet.name}
+        loading={deleting}
+        onCancel={() => setShowDeleteModal(false)}
+        onConfirm={handleDeletePet}
+      />
     </div>
   )
 }
