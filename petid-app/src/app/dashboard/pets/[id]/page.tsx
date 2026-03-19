@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { QRCode, getPublicPetUrl } from '@/components/qr-code'
-import { getPetById, updatePet, deletePet } from '@/services/pets-service'
+import { getPetById, updatePet, deletePet, uploadPetPhoto } from '@/services/pets-service'
 import { getHealthRecords, createHealthRecord, deleteHealthRecord } from '@/services/health-record-service'
 import type { Pet } from '@/types/pet'
 import type { HealthRecord } from '@/types/health-record'
@@ -23,6 +23,7 @@ export default function PetDetailPage() {
   const [showAddRecord, setShowAddRecord] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [newRecord, setNewRecord] = useState({
     type: 'vaccine' as 'vaccine' | 'allergy' | 'medical_note',
     description: '',
@@ -91,6 +92,22 @@ export default function PetDetailPage() {
     }
   }, [petId, router])
 
+  const handlePhotoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingPhoto(true)
+    try {
+      const photoUrl = await uploadPetPhoto(petId, file)
+      await updatePet(petId, { photo_url: photoUrl })
+      setPet(prev => prev ? { ...prev, photo_url: photoUrl } : null)
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to upload photo')
+    } finally {
+      setUploadingPhoto(false)
+    }
+  }, [petId])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -126,14 +143,54 @@ export default function PetDetailPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-3xl">{pet.name}</CardTitle>
-          <CardDescription>
-            {pet.species} {pet.breed && `- ${pet.breed}`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 text-sm">
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-shrink-0">
+              <div className="w-48 h-48 rounded-lg overflow-hidden bg-muted relative">
+                {pet.photo_url ? (
+                  <img 
+                    src={pet.photo_url} 
+                    alt={pet.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-16 w-16 text-muted-foreground"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                )}
+                <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={uploadingPhoto}
+                    className="hidden"
+                  />
+                  <span className="text-white text-sm font-medium">
+                    {uploadingPhoto ? 'Uploading...' : 'Upload Photo'}
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-3xl mb-2">{pet.name}</CardTitle>
+              <CardDescription className="text-lg mb-4">
+                {pet.species} {pet.breed && `- ${pet.breed}`}
+              </CardDescription>
+              <div className="grid grid-cols-2 gap-4 text-sm">
             {pet.birthdate && (
               <div>
                 <span className="text-muted-foreground">Birthdate:</span> {pet.birthdate}
@@ -165,6 +222,8 @@ export default function PetDetailPage() {
               </div>
             )}
           </div>
+          </div>
+        </div>
         </CardContent>
       </Card>
 
