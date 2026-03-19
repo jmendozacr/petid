@@ -38,12 +38,17 @@ export async function getPetById(id: string): Promise<Pet | null> {
   return data as Pet
 }
 
-export async function createPet(petData: Partial<Pet>): Promise<Pet> {
+export async function createPet(petData: Partial<Pet> & { name: string }): Promise<Pet> {
   const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('You must be logged in')
+  }
 
   const { data, error } = await supabase
     .from('pets')
-    .insert(petData)
+    .insert({ ...petData, user_id: user.id })
     .select()
     .single()
 

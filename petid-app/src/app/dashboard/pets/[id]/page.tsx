@@ -21,6 +21,8 @@ export default function PetDetailPage() {
   const [records, setRecords] = useState<HealthRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddRecord, setShowAddRecord] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [newRecord, setNewRecord] = useState({
     type: 'vaccine' as 'vaccine' | 'allergy' | 'medical_note',
     description: '',
@@ -77,6 +79,18 @@ export default function PetDetailPage() {
     }
   }, [])
 
+  const handleDeletePet = useCallback(async () => {
+    setDeleting(true)
+    try {
+      await deletePet(petId)
+      router.push('/dashboard')
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to delete pet')
+      setDeleting(false)
+      setShowDeleteModal(false)
+    }
+  }, [petId, router])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -106,7 +120,7 @@ export default function PetDetailPage() {
         <Button variant="outline" onClick={() => router.push('/dashboard')}>
           Back
         </Button>
-        <Button variant="destructive" onClick={() => router.push(`/dashboard/pets/${petId}/delete`)}>
+        <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
           Delete Pet
         </Button>
       </div>
@@ -296,6 +310,39 @@ export default function PetDetailPage() {
             No health records yet
           </CardContent>
         </Card>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <Card className="max-w-md w-full">
+            <CardHeader>
+              <CardTitle>Delete Pet</CardTitle>
+              <CardDescription>
+                Are you sure you want to delete {pet?.name}? This action cannot be undone.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleDeletePet}
+                  disabled={deleting}
+                  className="flex-1"
+                >
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )
