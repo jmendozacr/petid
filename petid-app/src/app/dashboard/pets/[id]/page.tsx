@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { usePet } from '@/hooks/usePet'
 import { useHealthRecords } from '@/hooks/useHealthRecords'
 import { DeleteConfirmModal } from '@/components/pet/DeleteConfirmModal'
@@ -34,6 +35,8 @@ export default function PetDetailPage() {
     setDeletingRecordId(id)
     try {
       await removeRecord(id)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete record')
     } finally {
       setDeletingRecordId(null)
     }
@@ -45,7 +48,7 @@ export default function PetDetailPage() {
       await remove()
       router.push('/dashboard')
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to delete pet')
+      toast.error(error instanceof Error ? error.message : 'Failed to delete pet')
       setDeleting(false)
       setShowDeleteModal(false)
     }
@@ -59,7 +62,7 @@ export default function PetDetailPage() {
     try {
       await uploadPhoto(file)
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to upload photo')
+      toast.error(error instanceof Error ? error.message : 'Failed to upload photo')
     } finally {
       setUploadingPhoto(false)
     }
@@ -67,8 +70,32 @@ export default function PetDetailPage() {
 
   if (petLoading || recordsLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <p className="text-muted-foreground">Loading...</p>
+      <div className="space-y-6 animate-pulse">
+        <div className="flex items-center justify-between">
+          <div className="h-9 w-20 rounded-md bg-muted" />
+          <div className="h-9 w-24 rounded-md bg-muted" />
+        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="w-48 h-48 rounded-lg bg-muted flex-shrink-0" />
+              <div className="flex-1 space-y-3">
+                <div className="h-8 w-48 rounded bg-muted" />
+                <div className="h-5 w-32 rounded bg-muted" />
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-4 rounded bg-muted" />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="py-8">
+            <div className="h-4 w-32 rounded bg-muted mx-auto" />
+          </CardContent>
+        </Card>
       </div>
     )
   }

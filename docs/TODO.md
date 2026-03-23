@@ -8,9 +8,9 @@
 - [x] Update `useReportForm.ts` to include `contact` field in INSERT after column is added
 
 ## UX / Notifications
-- [ ] Replace `alert()` calls with toasts (e.g. sonner) in `dashboard/pets/[id]/page.tsx` (photo upload and delete errors)
-- [ ] Add skeleton loaders in dashboard and pet detail (currently only shows "Loading..." text)
-- [ ] Add optimistic updates for delete operations
+- [x] Replace `alert()` calls with toasts (e.g. sonner) in `dashboard/pets/[id]/page.tsx` (photo upload and delete errors)
+- [x] Add skeleton loaders in dashboard and pet detail (currently only shows "Loading..." text)
+- [x] Add optimistic updates for delete operations
 
 ## Testing
 - [ ] Add tests for hooks: `usePets`, `usePet`, `useHealthRecords`, `usePetForm`, `useAuth`, `useReportForm`

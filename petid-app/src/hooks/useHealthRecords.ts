@@ -40,9 +40,15 @@ export function useHealthRecords(petId: string) {
   }, [petId])
 
   const remove = useCallback(async (id: string) => {
-    await deleteHealthRecord(id)
+    const previous = records
     setRecords(prev => prev.filter(r => r.id !== id))
-  }, [])
+    try {
+      await deleteHealthRecord(id)
+    } catch (err) {
+      setRecords(previous)
+      throw err
+    }
+  }, [records])
 
   const vaccines = records.filter(r => r.type === 'vaccine')
   const allergies = records.filter(r => r.type === 'allergy')

@@ -24,11 +24,17 @@ export default function DashboardPage() {
       </div>
 
       {isLoading ? (
-        <Card>
-          <CardContent className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Loading...</p>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-4 space-y-3">
+                <div className="w-full h-40 rounded-md bg-muted" />
+                <div className="h-5 w-3/4 rounded bg-muted" />
+                <div className="h-4 w-1/2 rounded bg-muted" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : error ? (
         <Card className="border-danger bg-danger/10">
           <CardContent className="py-4">
