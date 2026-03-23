@@ -41,6 +41,7 @@ export function useReportForm(petId: string) {
           pet_id: petId,
           message: formData.message,
           location: formData.location,
+          contact: formData.contact || null,
         })
 
       if (insertError) {

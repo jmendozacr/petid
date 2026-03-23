@@ -4,8 +4,8 @@
 - [ ] Configure domain petid.app
 
 ## Database
-- [ ] Add `contact` column to `found_reports` table in Supabase
-- [ ] Update `useReportForm.ts` to include `contact` field in INSERT after column is added
+- [x] Add `contact` column to `found_reports` table in Supabase
+- [x] Update `useReportForm.ts` to include `contact` field in INSERT after column is added
 
 ## UX / Notifications
 - [ ] Replace `alert()` calls with toasts (e.g. sonner) in `dashboard/pets/[id]/page.tsx` (photo upload and delete errors)
