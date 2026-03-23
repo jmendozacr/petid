@@ -9,6 +9,15 @@ export function useAuth() {
   const supabase = createClient()
 
   const signIn = useCallback(async (email: string, password: string): Promise<{ user: User | null }> => {
+    if (!email.trim() || !email.includes('@')) {
+      setError('Ingresa un email válido')
+      return { user: null }
+    }
+    if (!password || password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres')
+      return { user: null }
+    }
+
     setLoading(true)
     setError(null)
 
@@ -33,6 +42,15 @@ export function useAuth() {
   }, [supabase])
 
   const signUp = useCallback(async (email: string, password: string): Promise<{ success: boolean }> => {
+    if (!email.trim() || !email.includes('@')) {
+      setError('Ingresa un email válido')
+      return { success: false }
+    }
+    if (!password || password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres')
+      return { success: false }
+    }
+
     setLoading(true)
     setError(null)
 

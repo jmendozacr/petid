@@ -17,9 +17,15 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
     description: '',
     record_date: new Date().toISOString().split('T')[0],
   })
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData.description.trim()) {
+      setError('La descripción es requerida')
+      return
+    }
+    setError(null)
     onSubmit(formData)
     setFormData({
       type: 'vaccine',
@@ -35,6 +41,11 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          {error && (
+            <div role="alert" className="text-sm text-danger p-3 rounded-md bg-danger/10">
+              {error}
+            </div>
+          )}
           <div className="space-y-2">
             <Label>Type</Label>
             <select
@@ -62,7 +73,6 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               placeholder="Enter details..."
-              required
             />
           </div>
         </CardContent>

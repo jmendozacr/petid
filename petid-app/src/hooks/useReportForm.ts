@@ -26,6 +26,11 @@ export function useReportForm(petId: string) {
   }, [])
 
   const submit = useCallback(async (): Promise<boolean> => {
+    if (!formData.message.trim()) {
+      setError('El mensaje es requerido')
+      return false
+    }
+
     setLoading(true)
     setError(null)
 

@@ -1,5 +1,6 @@
 # Local AI agent files
 .agents/
+.claude/
 opencode.json
 skills-lock.json
 

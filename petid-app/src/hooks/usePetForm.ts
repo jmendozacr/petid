@@ -36,6 +36,11 @@ export function usePetForm() {
   }, [])
 
   const submit = useCallback(async (): Promise<Pet | null> => {
+    if (!formData.name.trim()) {
+      setError('El nombre de la mascota es requerido')
+      return null
+    }
+
     setLoading(true)
     setError(null)
 
