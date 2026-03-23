@@ -1,34 +1,24 @@
 # PetID - Pending Tasks
 
+## Deploy
+- [ ] Configure domain petid.app
+
 ## Database
-- [x] Re-configure foreign key constraint between pets and profiles with proper trigger
-- [x] Add trigger to auto-create profile when user signs up
+- [ ] Add `contact` column to `found_reports` table in Supabase
+- [ ] Update `useReportForm.ts` to include `contact` field in INSERT after column is added
+
+## UX / Notifications
+- [ ] Replace `alert()` calls with toasts (e.g. sonner) in `dashboard/pets/[id]/page.tsx` (photo upload and delete errors)
+- [ ] Add skeleton loaders in dashboard and pet detail (currently only shows "Loading..." text)
+- [ ] Add optimistic updates for delete operations
 
 ## Testing
-- [x] Set up unit testing framework (Vitest + React Testing Library)
-- [x] Add tests for Zustand store
+- [ ] Add tests for hooks: `usePets`, `usePet`, `useHealthRecords`, `usePetForm`, `useAuth`, `useReportForm`
+- [ ] Add tests for services: `pets-service.ts`, `health-record-service.ts`
 - [ ] Add tests for Pet CRUD components
 
-## Phase 5 - Health Records
-- [x] Add vaccine record
-- [x] Add allergy record
-- [x] Add medical note
-
-## Phase 6 - QR Code
-- [x] Generate QR code per pet
-- [x] Store public URL
-- [x] Display QR in dashboard
-
-## Phase 7 - Public Pet Page
-- [x] Create route /p/[petId]
-- [x] Show pet photo, name, breed, allergies, emergency contact
-
-## Phase 8 - Found Pet Reports
-- [x] Create route /p/[petId]/report
-- [x] Form with message, photo, location
-- [x] Store report in database
-
-## Phase 9 - Deploy
-- [x] Deploy frontend to Vercel
-- [x] Connect Supabase
-- [ ] Configure domain petid.app
+## Code Quality
+- [ ] Create reusable `EmptyState` component (dashboard and pet detail repeat the same pattern)
+- [ ] Create reusable `PhotoDisplay` component (pet photo with SVG fallback appears in 3 places)
+- [ ] Create `Select` component for `HealthRecordForm` (currently uses a raw `<select>` without a Label)
+- [ ] Add `Error Boundary` component to catch render errors
