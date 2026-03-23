@@ -18,7 +18,7 @@
 - [x] Add tests for Pet CRUD components
 
 ## Code Quality
-- [ ] Create reusable `EmptyState` component (dashboard and pet detail repeat the same pattern)
-- [ ] Create reusable `PhotoDisplay` component (pet photo with SVG fallback appears in 3 places)
-- [ ] Create `Select` component for `HealthRecordForm` (currently uses a raw `<select>` without a Label)
-- [ ] Add `Error Boundary` component to catch render errors
+- [x] Create reusable `EmptyState` component (dashboard and pet detail repeat the same pattern)
+- [x] Create reusable `PhotoDisplay` component (pet photo with SVG fallback appears in 3 places)
+- [x] Create `Select` component for `HealthRecordForm` (currently uses a raw `<select>` without a Label)
+- [x] Add `Error Boundary` component to catch render errors

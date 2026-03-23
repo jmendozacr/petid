@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import type { NewRecordData } from '@/hooks/useHealthRecords'
 
@@ -47,16 +48,16 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
             </div>
           )}
           <div className="space-y-2">
-            <Label>Type</Label>
-            <select
+            <Label htmlFor="record-type">Type</Label>
+            <Select
+              id="record-type"
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value as NewRecordData['type'] })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             >
               <option value="vaccine">Vaccine</option>
               <option value="allergy">Allergy</option>
               <option value="medical_note">Medical Note</option>
-            </select>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label>Date</Label>

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { ErrorBoundary } from '@/components/error-boundary'
 
 export default async function DashboardLayout({
   children,
@@ -43,7 +44,9 @@ export default async function DashboardLayout({
         </div>
       </header>
       <main id="main-content" className="max-w-7xl mx-auto px-4 py-8" role="main">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
     </div>
   )
