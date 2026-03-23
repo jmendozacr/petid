@@ -13,9 +13,9 @@
 - [x] Add optimistic updates for delete operations
 
 ## Testing
-- [ ] Add tests for hooks: `usePets`, `usePet`, `useHealthRecords`, `usePetForm`, `useAuth`, `useReportForm`
-- [ ] Add tests for services: `pets-service.ts`, `health-record-service.ts`
-- [ ] Add tests for Pet CRUD components
+- [x] Add tests for hooks: `usePets`, `usePet`, `useHealthRecords`, `usePetForm`, `useAuth`, `useReportForm`
+- [x] Add tests for services: `pets-service.ts`, `health-record-service.ts`
+- [x] Add tests for Pet CRUD components
 
 ## Code Quality
 - [ ] Create reusable `EmptyState` component (dashboard and pet detail repeat the same pattern)
