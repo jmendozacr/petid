@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 export type ReportFormData = {
@@ -19,7 +19,7 @@ export function useReportForm(petId: string) {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const handleChange = useCallback((field: keyof ReportFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))

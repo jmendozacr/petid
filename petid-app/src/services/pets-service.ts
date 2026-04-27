@@ -89,9 +89,19 @@ export async function deletePet(id: string): Promise<void> {
   }
 }
 
+const MAX_PHOTO_SIZE = 5 * 1024 * 1024
+
 export async function uploadPetPhoto(petId: string, file: File): Promise<string> {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('File must be an image')
+  }
+  if (file.size > MAX_PHOTO_SIZE) {
+    throw new Error('File must be under 5MB')
+  }
+
   const supabase = createClient()
-  const filePath = `pets/${petId}/${file.name}`
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+  const filePath = `pets/${petId}/photo.${ext}`
 
   const { error: uploadError } = await supabase.storage
     .from('pet-photos')

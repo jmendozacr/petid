@@ -1,11 +1,15 @@
 import { useState, useCallback, useEffect } from 'react'
-import { getPetById, updatePet, deletePet, uploadPetPhoto } from '@/services/pets-service'
+import { getPetById, updatePet as updatePetService, deletePet, uploadPetPhoto } from '@/services/pets-service'
+import { usePetStore } from '@/stores/pet-store'
 import type { Pet } from '@/types/pet'
 
 export function usePet(petId: string) {
   const [pet, setPet] = useState<Pet | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const updateInStore = usePetStore((state) => state.updatePet)
+  const removeFromStore = usePetStore((state) => state.removePet)
 
   const loadPet = useCallback(async () => {
     setLoading(true)
@@ -28,14 +32,16 @@ export function usePet(petId: string) {
   }, [loadPet])
 
   const update = useCallback(async (petData: Partial<Pet>) => {
-    const updated = await updatePet(petId, petData)
+    const updated = await updatePetService(petId, petData)
     setPet(updated)
+    updateInStore(updated)
     return updated
-  }, [petId])
+  }, [petId, updateInStore])
 
   const remove = useCallback(async () => {
     await deletePet(petId)
-  }, [petId])
+    removeFromStore(petId)
+  }, [petId, removeFromStore])
 
   const uploadPhoto = useCallback(async (file: File) => {
     const photoUrl = await uploadPetPhoto(petId, file)

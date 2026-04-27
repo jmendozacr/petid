@@ -30,13 +30,23 @@ export function useHealthRecords(petId: string) {
     loadRecords()
   }, [loadRecords])
 
-  const add = useCallback(async (data: Omit<NewRecordData, 'description' | 'record_date'> & { description: string; record_date: string }) => {
-    const newRecord = await createHealthRecord({
+  const add = useCallback(async (data: NewRecordData) => {
+    const tempId = `temp-${Date.now()}`
+    const optimisticRecord: HealthRecord = {
+      id: tempId,
       pet_id: petId,
+      created_at: new Date().toISOString(),
       ...data,
-    })
-    setRecords(prev => [newRecord, ...prev])
-    return newRecord
+    }
+    setRecords(prev => [optimisticRecord, ...prev])
+    try {
+      const newRecord = await createHealthRecord({ pet_id: petId, ...data })
+      setRecords(prev => prev.map(r => r.id === tempId ? newRecord : r))
+      return newRecord
+    } catch (err) {
+      setRecords(prev => prev.filter(r => r.id !== tempId))
+      throw err
+    }
   }, [petId])
 
   const remove = useCallback(async (id: string) => {

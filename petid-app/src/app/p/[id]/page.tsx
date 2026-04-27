@@ -14,22 +14,19 @@ export default async function PublicPetPage({ params }: PageProps) {
   const { id: petId } = await params
   const supabase = await createClient()
 
-  const { data: pet } = await supabase
-    .from('pets')
-    .select('*')
-    .eq('id', petId)
-    .single()
+  const [{ data: pet }, { data: records }] = await Promise.all([
+    supabase.from('pets').select('*').eq('id', petId).single(),
+    supabase
+      .from('health_records')
+      .select('*')
+      .eq('pet_id', petId)
+      .in('type', ['allergy', 'medical_note'])
+      .order('record_date', { ascending: false }),
+  ])
 
   if (!pet) {
     notFound()
   }
-
-  const { data: records } = await supabase
-    .from('health_records')
-    .select('*')
-    .eq('pet_id', petId)
-    .in('type', ['allergy', 'medical_note'])
-    .order('record_date', { ascending: false })
 
   const allergies = records?.filter(r => r.type === 'allergy') || []
   const medicalNotes = records?.filter(r => r.type === 'medical_note') || []

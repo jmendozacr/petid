@@ -24,7 +24,7 @@ const mockPet: Pet = {
 }
 
 beforeEach(() => {
-  usePetStore.setState({ pets: [], isLoading: false, error: null, selectedPet: null })
+  usePetStore.setState({ pets: [], isLoading: false, error: null })
   vi.clearAllMocks()
 })
 

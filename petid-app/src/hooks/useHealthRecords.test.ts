@@ -76,6 +76,23 @@ describe('useHealthRecords', () => {
     expect(result.current.records).toHaveLength(2)
   })
 
+  it('add reverts list on service error', async () => {
+    vi.mocked(getHealthRecords).mockResolvedValue([mockVaccine])
+    vi.mocked(createHealthRecord).mockRejectedValue(new Error('Create failed'))
+
+    const { result } = renderHook(() => useHealthRecords('pet-1'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await expect(
+      act(async () => {
+        await result.current.add({ type: 'medical_note', description: 'Checkup', record_date: '2024-03-01' })
+      })
+    ).rejects.toThrow('Create failed')
+
+    expect(result.current.records).toHaveLength(1)
+    expect(result.current.records[0].id).toBe('r1')
+  })
+
   it('remove optimistically removes record from list', async () => {
     vi.mocked(getHealthRecords).mockResolvedValue([mockVaccine, mockAllergy])
     vi.mocked(deleteHealthRecord).mockResolvedValue()

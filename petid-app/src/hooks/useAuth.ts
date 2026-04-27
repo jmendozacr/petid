@@ -1,20 +1,23 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
+
+function validateAuthFields(email: string, password: string): string | null {
+  if (!email.trim() || !email.includes('@')) return 'Ingresa un email válido'
+  if (!password || password.length < 6) return 'La contraseña debe tener al menos 6 caracteres'
+  return null
+}
 
 export function useAuth() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const signIn = useCallback(async (email: string, password: string): Promise<{ user: User | null }> => {
-    if (!email.trim() || !email.includes('@')) {
-      setError('Ingresa un email válido')
-      return { user: null }
-    }
-    if (!password || password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres')
+    const validationError = validateAuthFields(email, password)
+    if (validationError) {
+      setError(validationError)
       return { user: null }
     }
 
@@ -42,12 +45,9 @@ export function useAuth() {
   }, [supabase])
 
   const signUp = useCallback(async (email: string, password: string): Promise<{ success: boolean }> => {
-    if (!email.trim() || !email.includes('@')) {
-      setError('Ingresa un email válido')
-      return { success: false }
-    }
-    if (!password || password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres')
+    const validationError = validateAuthFields(email, password)
+    if (validationError) {
+      setError(validationError)
       return { success: false }
     }
 
