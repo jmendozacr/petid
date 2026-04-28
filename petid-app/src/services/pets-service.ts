@@ -76,6 +76,28 @@ export async function updatePet(id: string, petData: Partial<Pet>): Promise<Pet>
   return data as Pet
 }
 
+export async function toggleLostStatus(petId: string, isLost: boolean): Promise<Pet> {
+  const supabase = createClient()
+
+  // Invariant: lost_since must be null when is_lost is false
+  const update = isLost
+    ? { is_lost: true, lost_since: new Date().toISOString() }
+    : { is_lost: false, lost_since: null }
+
+  const { data, error } = await supabase
+    .from('pets')
+    .update(update)
+    .eq('id', petId)
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data as Pet
+}
+
 export async function deletePet(id: string): Promise<void> {
   const supabase = createClient()
 

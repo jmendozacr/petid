@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+
+export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PhotoDisplay } from '@/components/ui/photo-display'
@@ -34,6 +36,20 @@ export default async function PublicPetPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-md mx-auto space-y-6">
+        {pet.is_lost && (
+          <div className="border border-danger bg-danger/5 rounded-lg p-4">
+            <p className="text-danger font-bold text-lg">🚨 LOST PET</p>
+            {pet.lost_since && (
+              <p className="text-sm text-muted-foreground">
+                Lost since: {new Date(pet.lost_since).toLocaleDateString()}
+              </p>
+            )}
+            <a href={`/p/${pet.id}/report`} className="mt-2 inline-block underline text-sm">
+              📍 Report Found Pet
+            </a>
+          </div>
+        )}
+
         <Card>
           <div className="aspect-square bg-muted relative">
             <PhotoDisplay photoUrl={pet.photo_url} alt={pet.name} iconClassName="h-24 w-24" />

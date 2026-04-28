@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getPets, getPetById, createPet, updatePet, deletePet, uploadPetPhoto } from './pets-service'
+import { getPets, getPetById, createPet, updatePet, deletePet, uploadPetPhoto, toggleLostStatus } from './pets-service'
 import type { Pet } from '@/types/pet'
 
 const { mockTerminal, mockDeleteEq, mockGetUser, mockStorageUpload, mockGetPublicUrl } = vi.hoisted(() => ({
@@ -46,6 +46,8 @@ const mockPet: Pet = {
   photo_url: null,
   owner_phone: '+1234567890',
   emergency_contact: '+0987654321',
+  is_lost: false,
+  lost_since: null,
   created_at: '2024-01-01T00:00:00Z',
 }
 
@@ -144,6 +146,34 @@ describe('deletePet', () => {
     mockDeleteEq.mockResolvedValueOnce({ error: { message: 'Delete failed' } })
 
     await expect(deletePet('1')).rejects.toThrow('Delete failed')
+  })
+})
+
+describe('toggleLostStatus', () => {
+  it('marks pet as lost with populated lost_since', async () => {
+    const lostPet = { ...mockPet, is_lost: true, lost_since: '2024-06-01T00:00:00Z' }
+    mockTerminal.mockResolvedValueOnce({ data: lostPet, error: null })
+
+    const result = await toggleLostStatus('1', true)
+
+    expect(result.is_lost).toBe(true)
+    expect(result.lost_since).not.toBeNull()
+  })
+
+  it('marks pet as found with null lost_since', async () => {
+    const foundPet = { ...mockPet, is_lost: false, lost_since: null }
+    mockTerminal.mockResolvedValueOnce({ data: foundPet, error: null })
+
+    const result = await toggleLostStatus('1', false)
+
+    expect(result.is_lost).toBe(false)
+    expect(result.lost_since).toBeNull()
+  })
+
+  it('throws on database error', async () => {
+    mockTerminal.mockResolvedValueOnce({ data: null, error: { message: 'Toggle failed' } })
+
+    await expect(toggleLostStatus('1', true)).rejects.toThrow('Toggle failed')
   })
 })
 

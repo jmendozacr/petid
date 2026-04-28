@@ -5,7 +5,9 @@ import { useParams, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { usePet } from '@/hooks/usePet'
 import { useHealthRecords } from '@/hooks/useHealthRecords'
+import { usePetStore } from '@/stores/pet-store'
 import { DeleteConfirmModal } from '@/components/pet/DeleteConfirmModal'
+import { LostPetToggleButton } from '@/components/pet/lost-pet-toggle-button'
 import { HealthRecordItem } from '@/components/health-record/HealthRecordItem'
 import { HealthRecordForm } from '@/components/health-record/HealthRecordForm'
 import { QRCode, getPublicPetUrl } from '@/components/qr-code'
@@ -13,6 +15,7 @@ import { PhotoDisplay } from '@/components/ui/photo-display'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Pet } from '@/types/pet'
 
 export default function PetDetailPage() {
   const params = useParams()
@@ -21,6 +24,11 @@ export default function PetDetailPage() {
 
   const { pet, loading: petLoading, error: petError, update, remove, uploadPhoto, reload } = usePet(petId)
   const { vaccines, allergies, medicalNotes, add, remove: removeRecord, loading: recordsLoading } = useHealthRecords(petId)
+  const { updatePet } = usePetStore()
+
+  const handleToggled = useCallback((updatedPet: Pet) => {
+    updatePet(updatedPet)
+  }, [updatePet])
 
   const [showAddRecord, setShowAddRecord] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -119,9 +127,17 @@ export default function PetDetailPage() {
         <Button variant="outline" onClick={() => router.push('/dashboard')}>
           Back
         </Button>
-        <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
-          Delete Pet
-        </Button>
+        <div className="flex items-center gap-3">
+          <LostPetToggleButton
+            petId={pet.id}
+            isLost={pet.is_lost ?? false}
+            lostSince={pet.lost_since ?? null}
+            onToggled={handleToggled}
+          />
+          <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
+            Delete Pet
+          </Button>
+        </div>
       </div>
 
       <Card>

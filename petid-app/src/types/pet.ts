@@ -11,7 +11,14 @@ export type Pet = {
   photo_url: string | null
   owner_phone: string | null
   emergency_contact: string | null
+  is_lost: boolean
+  lost_since: string | null
   created_at: string
+}
+
+export type LostStatusUpdate = {
+  is_lost: boolean
+  lost_since: string | null
 }
 
 export type PetState = {
