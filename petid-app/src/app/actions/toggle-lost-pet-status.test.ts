@@ -2,29 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { Pet } from '@/types/pet'
 
 const mockGetUser = vi.fn()
-const mockFromSelect = vi.fn()
+const mockSelectSingle = vi.fn()
+const mockUpdateSingle = vi.fn()
 const mockRevalidatePath = vi.fn()
-const mockToggleLostStatus = vi.fn()
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({
     auth: { getUser: mockGetUser },
     from: () => ({
-      select: () => ({
-        eq: () => ({
-          single: mockFromSelect,
-        }),
-      }),
+      select: () => ({ eq: () => ({ single: mockSelectSingle }) }),
+      update: () => ({ eq: () => ({ select: () => ({ single: mockUpdateSingle }) }) }),
     }),
   }),
 }))
 
 vi.mock('next/cache', () => ({
   revalidatePath: mockRevalidatePath,
-}))
-
-vi.mock('@/services/pets-service', () => ({
-  toggleLostStatus: mockToggleLostStatus,
 }))
 
 const mockPet: Pet = {
@@ -57,35 +50,35 @@ describe('toggleLostPetStatus', () => {
     const result = await toggleLostPetStatus('pet-1', true)
 
     expect(result).toEqual({ success: false, error: 'Unauthorized' })
-    expect(mockToggleLostStatus).not.toHaveBeenCalled()
+    expect(mockUpdateSingle).not.toHaveBeenCalled()
   })
 
   it('returns error when pet is not found', async () => {
     mockGetUser.mockResolvedValueOnce({ data: { user: { id: 'user-1' } } })
-    mockFromSelect.mockResolvedValueOnce({ data: null, error: { message: 'not found' } })
+    mockSelectSingle.mockResolvedValueOnce({ data: null, error: { message: 'not found' } })
 
     const { toggleLostPetStatus } = await import('./toggle-lost-pet-status')
     const result = await toggleLostPetStatus('pet-1', true)
 
     expect(result).toEqual({ success: false, error: 'Pet not found' })
-    expect(mockToggleLostStatus).not.toHaveBeenCalled()
+    expect(mockUpdateSingle).not.toHaveBeenCalled()
   })
 
   it('returns error when pet belongs to a different user', async () => {
     mockGetUser.mockResolvedValueOnce({ data: { user: { id: 'user-2' } } })
-    mockFromSelect.mockResolvedValueOnce({ data: { user_id: 'user-1' }, error: null })
+    mockSelectSingle.mockResolvedValueOnce({ data: { user_id: 'user-1' }, error: null })
 
     const { toggleLostPetStatus } = await import('./toggle-lost-pet-status')
     const result = await toggleLostPetStatus('pet-1', true)
 
     expect(result).toEqual({ success: false, error: 'Unauthorized' })
-    expect(mockToggleLostStatus).not.toHaveBeenCalled()
+    expect(mockUpdateSingle).not.toHaveBeenCalled()
   })
 
   it('returns updated pet on success and calls revalidatePath', async () => {
     mockGetUser.mockResolvedValueOnce({ data: { user: { id: 'user-1' } } })
-    mockFromSelect.mockResolvedValueOnce({ data: { user_id: 'user-1' }, error: null })
-    mockToggleLostStatus.mockResolvedValueOnce(mockPet)
+    mockSelectSingle.mockResolvedValueOnce({ data: { user_id: 'user-1' }, error: null })
+    mockUpdateSingle.mockResolvedValueOnce({ data: mockPet, error: null })
 
     const { toggleLostPetStatus } = await import('./toggle-lost-pet-status')
     const result = await toggleLostPetStatus('pet-1', true)
@@ -95,10 +88,10 @@ describe('toggleLostPetStatus', () => {
     expect(mockRevalidatePath).toHaveBeenCalledWith('/dashboard/pets/pet-1')
   })
 
-  it('does not call revalidatePath on service error', async () => {
+  it('does not call revalidatePath on database error', async () => {
     mockGetUser.mockResolvedValueOnce({ data: { user: { id: 'user-1' } } })
-    mockFromSelect.mockResolvedValueOnce({ data: { user_id: 'user-1' }, error: null })
-    mockToggleLostStatus.mockRejectedValueOnce(new Error('DB failure'))
+    mockSelectSingle.mockResolvedValueOnce({ data: { user_id: 'user-1' }, error: null })
+    mockUpdateSingle.mockResolvedValueOnce({ data: null, error: { message: 'DB failure' } })
 
     const { toggleLostPetStatus } = await import('./toggle-lost-pet-status')
     const result = await toggleLostPetStatus('pet-1', true)

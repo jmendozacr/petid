@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { toggleLostStatus } from '@/services/pets-service'
 import type { Pet } from '@/types/pet'
 
 export async function toggleLostPetStatus(
@@ -31,10 +30,23 @@ export async function toggleLostPetStatus(
   }
 
   try {
-    const updated = await toggleLostStatus(petId, isLost)
+    // Invariant: lost_since must be null when is_lost is false
+    const update = isLost
+      ? { is_lost: true, lost_since: new Date().toISOString() }
+      : { is_lost: false, lost_since: null }
+
+    const { data: updated, error } = await supabase
+      .from('pets')
+      .update(update)
+      .eq('id', petId)
+      .select()
+      .single()
+
+    if (error) throw new Error(error.message)
+
     revalidatePath(`/p/${petId}`)
     revalidatePath(`/dashboard/pets/${petId}`)
-    return { success: true, pet: updated }
+    return { success: true, pet: updated as Pet }
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : 'Unknown error' }
   }
