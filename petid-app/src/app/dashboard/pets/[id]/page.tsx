@@ -10,7 +10,7 @@ import { DeleteConfirmModal } from '@/components/pet/DeleteConfirmModal'
 import { LostPetToggleButton } from '@/components/pet/lost-pet-toggle-button'
 import { HealthRecordItem } from '@/components/health-record/HealthRecordItem'
 import { HealthRecordForm } from '@/components/health-record/HealthRecordForm'
-import { QRCode, getPublicPetUrl } from '@/components/qr-code'
+import { QRCode, getPublicPetUrl, downloadQRCode, sanitizePetName } from '@/components/qr-code'
 import { PhotoDisplay } from '@/components/ui/photo-display'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Button } from '@/components/ui/button'
@@ -35,6 +35,7 @@ export default function PetDetailPage() {
   const [deleting, setDeleting] = useState(false)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [deletingRecordId, setDeletingRecordId] = useState<string | null>(null)
+  const [downloading, setDownloading] = useState(false)
 
   const handleAddRecord = useCallback(async (data: { type: 'vaccine' | 'allergy' | 'medical_note'; description: string; record_date: string }) => {
     await add(data)
@@ -77,6 +78,18 @@ export default function PetDetailPage() {
       setUploadingPhoto(false)
     }
   }, [uploadPhoto])
+
+  async function handleDownloadQR() {
+    setDownloading(true)
+    try {
+      await downloadQRCode(pet!.id, pet!.name)
+      toast.success(`Downloaded ${sanitizePetName(pet!.name)}-qrcode.png`)
+    } catch (error) {
+      toast.error(`Failed to download QR code: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   if (petLoading || recordsLoading) {
     return (
@@ -212,14 +225,14 @@ export default function PetDetailPage() {
           <p className="text-sm text-muted-foreground text-center">
             {getPublicPetUrl(petId)}
           </p>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="mt-4"
-            onClick={() => navigator.clipboard.writeText(getPublicPetUrl(petId))}
-          >
-            Copy Link
-          </Button>
+          <div className="flex gap-2 justify-center mt-4">
+            <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(getPublicPetUrl(petId))}>
+              Copy Link
+            </Button>
+            <Button variant="outline" size="sm" disabled={downloading} onClick={handleDownloadQR}>
+              {downloading ? 'Downloading...' : 'Download QR'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
