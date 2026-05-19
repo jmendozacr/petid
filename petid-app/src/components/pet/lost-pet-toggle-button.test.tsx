@@ -103,6 +103,18 @@ describe('LostPetToggleButton', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
   })
 
+  it('opens confirmation modal when Mark as Found is clicked', () => {
+    render(
+      <LostPetToggleButton petId="pet-1" isLost={true} lostSince={null} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Found' }))
+
+    expect(screen.getByRole('heading', { name: /mark as found/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /yes, mark as found/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
+  })
+
   it('closes modal without toggling when Cancel is clicked', () => {
     render(
       <LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />

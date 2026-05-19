@@ -29,11 +29,7 @@ export function LostPetToggleButton({ petId, isLost, lostSince, onToggled }: Los
   }
 
   function handleClick() {
-    if (!isLost) {
-      setShowConfirm(true)
-    } else {
-      handleConfirm()
-    }
+    setShowConfirm(true)
   }
 
   return (
@@ -58,11 +54,16 @@ export function LostPetToggleButton({ petId, isLost, lostSince, onToggled }: Los
           <div className="bg-card rounded-2xl border border-border shadow-warm-lg w-full max-w-sm animate-fade-up">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl" aria-hidden="true">🚨</span>
-                <h2 className="font-heading text-xl font-semibold text-foreground">Mark as Lost?</h2>
+                <span className="text-2xl" aria-hidden="true">{isLost ? '🏠' : '🚨'}</span>
+                <h2 className="font-heading text-xl font-semibold text-foreground">
+                  {isLost ? 'Mark as Found?' : 'Mark as Lost?'}
+                </h2>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                This will show a <strong className="text-danger">LOST PET</strong> banner on your pet&apos;s public page so anyone who finds them knows to contact you.
+                {isLost
+                  ? 'This will remove the LOST PET banner from your pet\'s public page.'
+                  : <>This will show a <strong className="text-danger">LOST PET</strong> banner on your pet&apos;s public page so anyone who finds them knows to contact you.</>
+                }
               </p>
             </div>
             <div className="flex gap-3 px-6 pb-6">
@@ -75,12 +76,12 @@ export function LostPetToggleButton({ petId, isLost, lostSince, onToggled }: Los
                 Cancel
               </Button>
               <Button
-                variant="destructive"
+                variant={isLost ? 'success' : 'destructive'}
                 className="flex-1"
                 onClick={handleConfirm}
                 disabled={isLoading}
               >
-                {isLoading ? 'Updating...' : 'Yes, mark as lost'}
+                {isLoading ? 'Updating...' : isLost ? 'Yes, mark as found' : 'Yes, mark as lost'}
               </Button>
             </div>
           </div>
