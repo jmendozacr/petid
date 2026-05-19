@@ -88,7 +88,31 @@ describe('LostPetToggleButton', () => {
       <LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />
     )
 
-    expect(screen.getByRole('button')).toBeDisabled()
+    expect(screen.getByRole('button', { name: /updating/i })).toBeDisabled()
+  })
+
+  it('opens confirmation modal when Mark as Lost is clicked', () => {
+    render(
+      <LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Lost' }))
+
+    expect(screen.getByRole('heading', { name: /mark as lost/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /yes, mark as lost/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
+  })
+
+  it('closes modal without toggling when Cancel is clicked', () => {
+    render(
+      <LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Lost' }))
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
+
+    expect(screen.queryByRole('heading', { name: /mark as lost/i })).toBeNull()
+    expect(mockToggle).not.toHaveBeenCalled()
   })
 
   it('calls onToggled with the pet on successful toggle', async () => {
@@ -99,7 +123,8 @@ describe('LostPetToggleButton', () => {
       <LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} onToggled={onToggled} />
     )
 
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Lost' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as lost/i }))
 
     await waitFor(() => {
       expect(onToggled).toHaveBeenCalledWith(mockPet)
@@ -113,7 +138,8 @@ describe('LostPetToggleButton', () => {
       <LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />
     )
 
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Lost' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as lost/i }))
 
     await waitFor(() => {
       expect(mockToast.success).toHaveBeenCalled()
@@ -127,7 +153,8 @@ describe('LostPetToggleButton', () => {
       <LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />
     )
 
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Lost' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as lost/i }))
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled()
