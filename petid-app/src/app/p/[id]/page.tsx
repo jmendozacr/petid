@@ -1,15 +1,30 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-
-export const dynamic = 'force-dynamic'
 import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PhotoDisplay } from '@/components/ui/photo-display'
 import { QRCode } from '@/components/qr-code'
 import { Button } from '@/components/ui/button'
 
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: Promise<{ id: string }>
+}
+
+function SectionCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`bg-card rounded-2xl border border-border shadow-warm p-5 ${className}`}>
+      {children}
+    </div>
+  )
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+      {children}
+    </p>
+  )
 }
 
 export default async function PublicPetPage({ params }: PageProps) {
@@ -34,107 +49,122 @@ export default async function PublicPetPage({ params }: PageProps) {
   const medicalNotes = records?.filter(r => r.type === 'medical_note') || []
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-md mx-auto space-y-6">
+    <div className="min-h-screen bg-background">
+      {/* Hero photo */}
+      <div className="relative h-[45vh] min-h-[260px] bg-muted overflow-hidden">
+        <PhotoDisplay photoUrl={pet.photo_url} alt={pet.name} iconClassName="h-28 w-28" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="max-w-md mx-auto px-4 pb-16 -mt-4 relative space-y-4">
+
+        {/* Lost banner */}
         {pet.is_lost && (
-          <div className="border border-danger bg-danger/5 rounded-lg p-4">
-            <p className="text-danger font-bold text-lg">🚨 LOST PET</p>
+          <div className="bg-danger text-danger-foreground rounded-2xl p-5 shadow-warm-md animate-scale-in">
+            <div className="flex items-center gap-2.5 mb-1">
+              <span className="text-2xl" role="img" aria-label="Alert">🚨</span>
+              <p className="font-heading text-2xl font-bold tracking-tight">LOST PET</p>
+            </div>
             {pet.lost_since && (
-              <p className="text-sm text-muted-foreground">
-                Lost since: {new Date(pet.lost_since).toLocaleDateString()}
+              <p className="text-sm opacity-85 mb-4">
+                Missing since {new Date(pet.lost_since).toLocaleDateString('en-US', {
+                  month: 'long', day: 'numeric', year: 'numeric'
+                })}
               </p>
             )}
-            <a href={`/p/${pet.id}/report`} className="mt-2 inline-block underline text-sm">
-              📍 Report Found Pet
+            <a
+              href={`/p/${pet.id}/report`}
+              className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 transition-colors rounded-xl px-4 py-2.5 text-sm font-medium"
+            >
+              📍 I found this pet — report here
             </a>
           </div>
         )}
 
-        <Card>
-          <div className="aspect-square bg-muted relative">
-            <PhotoDisplay photoUrl={pet.photo_url} alt={pet.name} iconClassName="h-24 w-24" />
-          </div>
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl">{pet.name}</CardTitle>
-            <CardDescription className="text-lg">
-              {pet.species} {pet.breed && `• ${pet.breed}`}
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        {/* Identity */}
+        <div className="pt-2 pb-2 animate-fade-up">
+          <h1 className="font-heading text-5xl font-bold text-foreground leading-tight">{pet.name}</h1>
+          <p className="text-muted-foreground text-lg mt-1">
+            {pet.species}{pet.breed && ` · ${pet.breed}`}
+          </p>
+        </div>
 
+        {/* Owner contact */}
         {pet.owner_phone && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Owner Contact</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-lg">{pet.owner_phone}</p>
-            </CardContent>
-          </Card>
+          <SectionCard>
+            <SectionLabel>Owner Contact</SectionLabel>
+            <a
+              href={`tel:${pet.owner_phone}`}
+              className="text-xl font-medium text-foreground hover:text-primary transition-colors"
+            >
+              {pet.owner_phone}
+            </a>
+          </SectionCard>
         )}
 
+        {/* Emergency contact */}
         {pet.emergency_contact && (
-          <Card className="border-danger bg-danger/5">
-            <CardHeader>
-              <CardTitle className="text-lg text-danger">Emergency Contact</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-lg">{pet.emergency_contact}</p>
-            </CardContent>
-          </Card>
+          <SectionCard className="border-danger/30 bg-danger/5">
+            <SectionLabel>Emergency Contact</SectionLabel>
+            <a
+              href={`tel:${pet.emergency_contact}`}
+              className="text-xl font-medium text-danger hover:text-danger/80 transition-colors"
+            >
+              {pet.emergency_contact}
+            </a>
+          </SectionCard>
         )}
 
+        {/* Allergies */}
         {allergies.length > 0 && (
-          <Card className="border-danger">
-            <CardHeader>
-              <CardTitle className="text-lg text-danger">⚠️ Allergies</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <SectionCard className="border-danger/30">
+            <SectionLabel>⚠️ Allergies</SectionLabel>
+            <div className="space-y-2">
               {allergies.map((allergy) => (
-                <div key={allergy.id} className="p-3 bg-danger/10 rounded-md">
-                  <p className="font-medium">{allergy.description}</p>
-                  <p className="text-sm text-muted-foreground">{allergy.record_date}</p>
+                <div key={allergy.id} className="flex items-start justify-between gap-3 p-3 bg-danger/8 rounded-xl">
+                  <p className="font-medium text-foreground">{allergy.description}</p>
+                  <time className="text-xs text-muted-foreground shrink-0 mt-0.5">{allergy.record_date}</time>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
         )}
 
+        {/* Medical notes */}
         {medicalNotes.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Medical Notes</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <SectionCard>
+            <SectionLabel>Medical Notes</SectionLabel>
+            <div className="space-y-2">
               {medicalNotes.map((note) => (
-                <div key={note.id} className="p-3 bg-muted rounded-md">
-                  <p className="font-medium">{note.description}</p>
-                  <p className="text-sm text-muted-foreground">{note.record_date}</p>
+                <div key={note.id} className="flex items-start justify-between gap-3 p-3 bg-muted rounded-xl">
+                  <p className="font-medium text-foreground">{note.description}</p>
+                  <time className="text-xs text-muted-foreground shrink-0 mt-0.5">{note.record_date}</time>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
         )}
 
+        {/* Microchip */}
         {pet.microchip_id && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Microchip ID</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="font-mono text-lg">{pet.microchip_id}</p>
-            </CardContent>
-          </Card>
+          <SectionCard>
+            <SectionLabel>Microchip ID</SectionLabel>
+            <p className="font-mono text-lg text-foreground tracking-wide">{pet.microchip_id}</p>
+          </SectionCard>
         )}
 
-        <Button asChild className="w-full" variant="outline">
-          <Link href={`/p/${pet.id}/report`}>
-            📍 Report Found Pet
-          </Link>
-        </Button>
+        {/* Report found button */}
+        {!pet.is_lost && (
+          <Button asChild className="w-full" variant="outline">
+            <Link href={`/p/${pet.id}/report`}>
+              📍 Report Found Pet
+            </Link>
+          </Button>
+        )}
 
-        <p className="text-center text-sm text-muted-foreground">
-          Powered by PetID
+        <p className="text-center text-xs text-muted-foreground pt-4">
+          Powered by <span className="font-heading font-semibold text-primary">PetID</span>
         </p>
       </div>
     </div>

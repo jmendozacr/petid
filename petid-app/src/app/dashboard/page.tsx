@@ -16,24 +16,27 @@ export default function DashboardPage() {
   }, [loadPets])
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">My Pets</h1>
+    <div className="space-y-8">
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="font-heading text-3xl font-semibold text-foreground">My Pets</h1>
+          {!isLoading && !error && pets.length > 0 && (
+            <p className="text-muted-foreground mt-1">
+              {pets.length} {pets.length === 1 ? 'companion' : 'companions'} registered
+            </p>
+          )}
+        </div>
         <Button asChild>
           <Link href="/dashboard/pets/new">Add New Pet</Link>
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-4 space-y-3">
-                <div className="w-full h-40 rounded-md bg-muted" />
-                <div className="h-5 w-3/4 rounded bg-muted" />
-                <div className="h-4 w-1/2 rounded bg-muted" />
-              </CardContent>
-            </Card>
+            <div key={i} className="rounded-xl overflow-hidden shadow-warm animate-pulse">
+              <div className="aspect-square bg-muted" />
+            </div>
           ))}
         </div>
       ) : error ? (
@@ -43,13 +46,13 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       ) : pets.length === 0 ? (
-        <Card>
+        <Card className="border-dashed">
           <EmptyState
             message="You haven't added any pets yet"
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-16 w-16 mx-auto"
+                className="h-14 w-14 mx-auto"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -57,7 +60,7 @@ export default function DashboardPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={1.5}
+                  strokeWidth={1.2}
                   d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
@@ -70,7 +73,7 @@ export default function DashboardPage() {
           />
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {pets.map((pet) => (
             <PetCard key={pet.id} pet={pet} />
           ))}
