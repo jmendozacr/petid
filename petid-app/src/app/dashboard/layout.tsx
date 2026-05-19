@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { MobileMenu } from '@/components/ui/mobile-menu'
 import { ErrorBoundary } from '@/components/error-boundary'
 
 function PawIcon({ className }: { className?: string }) {
@@ -38,7 +38,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card shadow-warm sticky top-0 z-40" role="banner">
+      <header className="border-b bg-card shadow-warm sticky top-0 z-40 relative" role="banner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link
             href="/dashboard"
@@ -49,16 +49,7 @@ export default async function DashboardLayout({
           </Link>
 
           <nav aria-label="Main navigation">
-            <div className="flex items-center gap-2">
-              <span className="hidden sm:block text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full border border-border truncate max-w-[200px]">
-                {user.email}
-              </span>
-              <form action={handleSignOut}>
-                <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                  Sign Out
-                </Button>
-              </form>
-            </div>
+            <MobileMenu email={user.email!} signOutAction={handleSignOut} />
           </nav>
         </div>
       </header>
