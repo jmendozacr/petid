@@ -1,4 +1,7 @@
+'use client'
+
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,6 +16,7 @@ interface HealthRecordFormProps {
 }
 
 export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRecordFormProps) {
+  const t = useTranslations('healthRecord')
   const [formData, setFormData] = useState<NewRecordData>({
     type: 'vaccine',
     description: '',
@@ -23,7 +27,7 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.description.trim()) {
-      setError('La descripción es requerida')
+      setError(t('descriptionRequired'))
       return
     }
     setError(null)
@@ -38,7 +42,7 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Health Record</CardTitle>
+        <CardTitle>{t('addTitle')}</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
@@ -48,19 +52,19 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="record-type">Type</Label>
+            <Label htmlFor="record-type">{t('type')}</Label>
             <Select
               id="record-type"
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value as NewRecordData['type'] })}
             >
-              <option value="vaccine">Vaccine</option>
-              <option value="allergy">Allergy</option>
-              <option value="medical_note">Medical Note</option>
+              <option value="vaccine">{t('vaccine')}</option>
+              <option value="allergy">{t('allergy')}</option>
+              <option value="medical_note">{t('medicalNote')}</option>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Date</Label>
+            <Label>{t('date')}</Label>
             <Input
               type="date"
               value={formData.record_date}
@@ -68,17 +72,17 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
             />
           </div>
           <div className="space-y-2">
-            <Label>Description</Label>
+            <Label>{t('description')}</Label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              placeholder="Enter details..."
+              placeholder={t('descriptionPlaceholder')}
             />
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isSubmitting}>Save Record</Button>
+          <Button type="submit" disabled={isSubmitting}>{t('save')}</Button>
         </CardFooter>
       </form>
     </Card>

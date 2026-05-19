@@ -1,0 +1,167 @@
+{
+  "nav": {
+    "signOut": "Cerrar sesión"
+  },
+  "landing": {
+    "headline": "Cada mascota merece una identidad.",
+    "description": "Creá el perfil digital de tu mascota, generá un código QR y ayudala a volver a casa si alguna vez se pierde.",
+    "signIn": "Iniciar sesión",
+    "createAccount": "Crear cuenta",
+    "features": {
+      "healthRecords": "Registros de salud",
+      "qrId": "Identificación QR",
+      "lostAlerts": "Alertas de mascota perdida",
+      "emergency": "Contactos de emergencia"
+    }
+  },
+  "login": {
+    "title": "Bienvenido de vuelta",
+    "subtitle": "Iniciá sesión para gestionar tus mascotas",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "submit": "Iniciar sesión",
+    "submitting": "Iniciando sesión...",
+    "noAccount": "¿No tenés cuenta?",
+    "createOne": "Crear una"
+  },
+  "signup": {
+    "title": "Crear cuenta",
+    "subtitle": "Empezá a gestionar tus mascotas hoy",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "passwordHint": "Al menos 6 caracteres",
+    "submit": "Crear cuenta",
+    "submitting": "Creando cuenta...",
+    "successMessage": "¡Revisá tu correo para confirmar tu cuenta!",
+    "goToLogin": "Ir al inicio de sesión",
+    "haveAccount": "¿Ya tenés cuenta?",
+    "signIn": "Iniciá sesión"
+  },
+  "dashboard": {
+    "title": "Mis mascotas",
+    "companions": "{count, plural, one {# compañero registrado} other {# compañeros registrados}}",
+    "addPet": "Agregar mascota",
+    "addFirstPet": "Agregar tu primera mascota",
+    "emptyMessage": "Todavía no agregaste ninguna mascota"
+  },
+  "petCard": {
+    "viewDetails": "Ver detalles"
+  },
+  "newPet": {
+    "title": "Agregar mascota",
+    "subtitle": "Ingresá la información de tu mascota",
+    "cancel": "Cancelar",
+    "submit": "Guardar mascota",
+    "submitting": "Guardando..."
+  },
+  "petDetail": {
+    "deletePet": "Eliminar mascota",
+    "markAsLost": "Marcar como perdida",
+    "markAsFound": "Marcar como encontrada",
+    "updating": "Actualizando...",
+    "lostSince": "Perdida desde: {date}",
+    "confirmLostTitle": "¿Marcar como perdida?",
+    "confirmLostDescription": "Esto mostrará un banner de MASCOTA PERDIDA en la página pública de tu mascota para que quien la encuentre sepa cómo contactarte.",
+    "confirmLostAction": "Sí, marcar como perdida",
+    "confirmFoundTitle": "¿Marcar como encontrada?",
+    "confirmFoundDescription": "Esto eliminará el banner de MASCOTA PERDIDA de la página pública de tu mascota.",
+    "confirmFoundAction": "Sí, marcar como encontrada",
+    "cancel": "Cancelar",
+    "uploadPhoto": "Subir foto",
+    "uploading": "Subiendo...",
+    "qrTitle": "Código QR",
+    "qrSubtitle": "Escaneá para ver la info pública de tu mascota",
+    "copyLink": "Copiar enlace",
+    "downloadQR": "Descargar QR",
+    "downloading": "Descargando...",
+    "healthTitle": "Registros de salud",
+    "addRecord": "Agregar registro",
+    "vaccines": "Vacunas",
+    "allergies": "Alergias",
+    "medicalNotes": "Notas médicas",
+    "noRecords": "Sin registros de salud",
+    "fieldBirthdate": "Fecha de nacimiento",
+    "fieldColor": "Color",
+    "fieldWeight": "Peso",
+    "fieldMicrochip": "Microchip",
+    "fieldPhone": "Teléfono",
+    "fieldEmergency": "Emergencia",
+    "toastMarkedLost": "Mascota marcada como perdida.",
+    "toastMarkedFound": "¡Mascota marcada como encontrada!",
+    "toastToggleError": "Error al actualizar el estado. Intentá de nuevo.",
+    "toastQrDownloaded": "Descargado {filename}",
+    "toastQrError": "Error al descargar el código QR: {error}",
+    "toastDeleteError": "Error al eliminar la mascota",
+    "toastRecordError": "Error al eliminar el registro",
+    "notFound": "Mascota no encontrada",
+    "backToDashboard": "Volver al panel",
+    "deleteTitle": "Eliminar mascota"
+  },
+  "publicPet": {
+    "lostTitle": "MASCOTA PERDIDA",
+    "lostSince": "Desaparecida desde {date}",
+    "reportLink": "Encontré esta mascota — reportar aquí",
+    "ownerContact": "Contacto del dueño",
+    "emergencyContact": "Contacto de emergencia",
+    "allergies": "⚠️ Alergias",
+    "medicalNotes": "Notas médicas",
+    "microchipId": "ID de microchip",
+    "reportButton": "Reportar mascota encontrada",
+    "poweredBy": "Desarrollado por"
+  },
+  "reportFound": {
+    "title": "Reportar mascota encontrada",
+    "subtitle": "Avisale al dueño que encontraste su mascota",
+    "message": "Mensaje",
+    "messagePlaceholder": "¿Dónde encontraste la mascota? Cualquier detalle...",
+    "location": "Ubicación",
+    "locationPlaceholder": "Calle, barrio, ciudad...",
+    "contact": "Tu contacto (opcional)",
+    "contactPlaceholder": "Teléfono o correo...",
+    "submit": "Enviar reporte",
+    "submitting": "Enviando...",
+    "successTitle": "¡Reporte enviado!",
+    "successDescription": "Gracias por reportar esta mascota. El dueño será notificado.",
+    "backToPet": "Volver a la mascota",
+    "back": "Volver"
+  },
+  "petForm": {
+    "name": "Nombre",
+    "nameRequired": "Nombre *",
+    "namePlaceholder": "El nombre de tu mascota",
+    "species": "Especie",
+    "speciesPlaceholder": "Perro, Gato, Pájaro...",
+    "breed": "Raza",
+    "breedPlaceholder": "Golden Retriever...",
+    "birthdate": "Fecha de nacimiento",
+    "color": "Color",
+    "colorPlaceholder": "Marrón, Blanco...",
+    "weight": "Peso (kg)",
+    "microchip": "ID de microchip",
+    "ownerPhone": "Teléfono del dueño",
+    "emergencyContact": "Contacto de emergencia"
+  },
+  "healthRecord": {
+    "addTitle": "Agregar registro de salud",
+    "type": "Tipo",
+    "vaccine": "Vacuna",
+    "allergy": "Alergia",
+    "medicalNote": "Nota médica",
+    "date": "Fecha",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Ingresá los detalles...",
+    "save": "Guardar registro",
+    "descriptionRequired": "La descripción es requerida",
+    "delete": "Eliminar"
+  },
+  "deleteConfirm": {
+    "description": "¿Estás seguro de que querés eliminar a {name}? Esta acción no se puede deshacer.",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "deleting": "Eliminando..."
+  },
+  "language": {
+    "en": "EN",
+    "es": "ES"
+  }
+}

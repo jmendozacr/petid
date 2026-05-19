@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -18,6 +21,8 @@ export function DeleteConfirmModal({
   onCancel,
   onConfirm,
 }: DeleteConfirmModalProps) {
+  const t = useTranslations('deleteConfirm')
+
   if (!isOpen) return null
 
   return (
@@ -25,27 +30,25 @@ export function DeleteConfirmModal({
       <Card className="max-w-md w-full">
         <CardHeader>
           <CardTitle>{title}</CardTitle>
-          <CardDescription>
-            Are you sure you want to delete {itemName}? This action cannot be undone.
-          </CardDescription>
+          <CardDescription>{t('description', { name: itemName })}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={onCancel}
               disabled={loading}
               className="flex-1"
             >
-              Cancel
+              {t('cancel')}
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={onConfirm}
               disabled={loading}
               className="flex-1"
             >
-              {loading ? 'Deleting...' : 'Delete'}
+              {loading ? t('deleting') : t('delete')}
             </Button>
           </div>
         </CardContent>

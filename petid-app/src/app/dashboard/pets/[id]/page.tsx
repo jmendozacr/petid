@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { usePet } from '@/hooks/usePet'
 import { useHealthRecords } from '@/hooks/useHealthRecords'
@@ -18,6 +19,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import type { Pet } from '@/types/pet'
 
 export default function PetDetailPage() {
+  const t = useTranslations('petDetail')
   const params = useParams()
   const router = useRouter()
   const petId = params.id as string
@@ -47,11 +49,11 @@ export default function PetDetailPage() {
     try {
       await removeRecord(id)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to delete record')
+      toast.error(error instanceof Error ? error.message : t('toastRecordError'))
     } finally {
       setDeletingRecordId(null)
     }
-  }, [removeRecord])
+  }, [removeRecord, t])
 
   const handleDeletePet = useCallback(async () => {
     setDeleting(true)
@@ -59,11 +61,11 @@ export default function PetDetailPage() {
       await remove()
       router.push('/dashboard')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to delete pet')
+      toast.error(error instanceof Error ? error.message : t('toastDeleteError'))
       setDeleting(false)
       setShowDeleteModal(false)
     }
-  }, [remove, router])
+  }, [remove, router, t])
 
   const handlePhotoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -73,19 +75,19 @@ export default function PetDetailPage() {
     try {
       await uploadPhoto(file)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to upload photo')
+      toast.error(error instanceof Error ? error.message : t('toastDeleteError'))
     } finally {
       setUploadingPhoto(false)
     }
-  }, [uploadPhoto])
+  }, [uploadPhoto, t])
 
   async function handleDownloadQR() {
     setDownloading(true)
     try {
       await downloadQRCode(pet!.id, pet!.name)
-      toast.success(`Downloaded ${sanitizePetName(pet!.name)}-qrcode.png`)
+      toast.success(t('toastQrDownloaded', { filename: `${sanitizePetName(pet!.name)}-qrcode.png` }))
     } catch (error) {
-      toast.error(`Failed to download QR code: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      toast.error(t('toastQrError', { error: error instanceof Error ? error.message : 'Unknown error' }))
     } finally {
       setDownloading(false)
     }
@@ -126,9 +128,9 @@ export default function PetDetailPage() {
   if (petError || !pet) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">{petError || 'Pet not found'}</p>
+        <p className="text-muted-foreground">{petError || t('notFound')}</p>
         <Button onClick={() => router.push('/dashboard')} className="mt-4">
-          Back to Dashboard
+          {t('backToDashboard')}
         </Button>
       </div>
     )
@@ -150,7 +152,7 @@ export default function PetDetailPage() {
             onToggled={handleToggled}
           />
           <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
-            Delete Pet
+            {t('deletePet')}
           </Button>
         </div>
       </div>
@@ -170,7 +172,7 @@ export default function PetDetailPage() {
                     className="hidden"
                   />
                   <span className="text-white text-sm font-medium">
-                    {uploadingPhoto ? 'Uploading...' : 'Upload Photo'}
+                    {uploadingPhoto ? t('uploading') : t('uploadPhoto')}
                   </span>
                 </label>
               </div>
@@ -183,32 +185,32 @@ export default function PetDetailPage() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {pet.birthdate && (
                   <div>
-                    <span className="text-muted-foreground">Birthdate:</span> {pet.birthdate}
+                    <span className="text-muted-foreground">{t('fieldBirthdate')}:</span> {pet.birthdate}
                   </div>
                 )}
                 {pet.color && (
                   <div>
-                    <span className="text-muted-foreground">Color:</span> {pet.color}
+                    <span className="text-muted-foreground">{t('fieldColor')}:</span> {pet.color}
                   </div>
                 )}
                 {pet.weight && (
                   <div>
-                    <span className="text-muted-foreground">Weight:</span> {pet.weight} kg
+                    <span className="text-muted-foreground">{t('fieldWeight')}:</span> {pet.weight} kg
                   </div>
                 )}
                 {pet.microchip_id && (
                   <div>
-                    <span className="text-muted-foreground">Microchip:</span> {pet.microchip_id}
+                    <span className="text-muted-foreground">{t('fieldMicrochip')}:</span> {pet.microchip_id}
                   </div>
                 )}
                 {pet.owner_phone && (
                   <div>
-                    <span className="text-muted-foreground">Phone:</span> {pet.owner_phone}
+                    <span className="text-muted-foreground">{t('fieldPhone')}:</span> {pet.owner_phone}
                   </div>
                 )}
                 {pet.emergency_contact && (
                   <div>
-                    <span className="text-muted-foreground">Emergency:</span> {pet.emergency_contact}
+                    <span className="text-muted-foreground">{t('fieldEmergency')}:</span> {pet.emergency_contact}
                   </div>
                 )}
               </div>
@@ -219,8 +221,8 @@ export default function PetDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">QR Code</CardTitle>
-          <CardDescription>Scan this to view pet info publicly</CardDescription>
+          <CardTitle className="text-lg">{t('qrTitle')}</CardTitle>
+          <CardDescription>{t('qrSubtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center">
           <QRCode value={getPublicPetUrl(petId)} size={200} className="mb-4" />
@@ -229,19 +231,19 @@ export default function PetDetailPage() {
           </p>
           <div className="flex gap-2 justify-center mt-4">
             <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(getPublicPetUrl(petId))}>
-              Copy Link
+              {t('copyLink')}
             </Button>
             <Button variant="outline" size="sm" disabled={downloading} onClick={handleDownloadQR}>
-              {downloading ? 'Downloading...' : 'Download QR'}
+              {downloading ? t('downloading') : t('downloadQR')}
             </Button>
           </div>
         </CardContent>
       </Card>
 
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Health Records</h2>
+        <h2 className="text-xl font-bold">{t('healthTitle')}</h2>
         <Button onClick={() => setShowAddRecord(!showAddRecord)}>
-          {showAddRecord ? 'Cancel' : 'Add Record'}
+          {showAddRecord ? t('cancel') : t('addRecord')}
         </Button>
       </div>
 
@@ -255,7 +257,7 @@ export default function PetDetailPage() {
       {vaccines.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-success">Vaccines</CardTitle>
+            <CardTitle className="text-lg text-success">{t('vaccines')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {vaccines.map((record) => (
@@ -273,7 +275,7 @@ export default function PetDetailPage() {
       {allergies.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-danger">Allergies</CardTitle>
+            <CardTitle className="text-lg text-danger">{t('allergies')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {allergies.map((record) => (
@@ -291,7 +293,7 @@ export default function PetDetailPage() {
       {medicalNotes.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Medical Notes</CardTitle>
+            <CardTitle className="text-lg">{t('medicalNotes')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {medicalNotes.map((record) => (
@@ -308,13 +310,13 @@ export default function PetDetailPage() {
 
       {vaccines.length === 0 && allergies.length === 0 && medicalNotes.length === 0 && (
         <Card>
-          <EmptyState message="No health records yet" />
+          <EmptyState message={t('noRecords')} />
         </Card>
       )}
 
       <DeleteConfirmModal
         isOpen={showDeleteModal}
-        title="Delete Pet"
+        title={t('deleteTitle')}
         itemName={pet.name}
         loading={deleting}
         onCancel={() => setShowDeleteModal(false)}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,6 +21,7 @@ function PawIcon({ className }: { className?: string }) {
 }
 
 export default function SignupPage() {
+  const t = useTranslations('signup')
   const { loading, error, signUp, clearError } = useAuth()
 
   const [email, setEmail] = useState('')
@@ -46,18 +48,18 @@ export default function SignupPage() {
             <PawIcon className="h-6 w-6 text-primary" />
             <span className="font-heading text-lg font-semibold tracking-tight">PetID</span>
           </Link>
-          <h1 className="font-heading text-3xl font-semibold text-foreground">Create account</h1>
-          <p className="text-muted-foreground mt-1.5">Start managing your pets today</p>
+          <h1 className="font-heading text-3xl font-semibold text-foreground">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1.5">{t('subtitle')}</p>
         </div>
 
         <div className="bg-card rounded-2xl border border-border shadow-warm-md p-8">
           {success ? (
             <div className="space-y-4 text-center">
               <div role="alert" aria-live="polite" className="text-sm text-success p-3 rounded-lg bg-success/10 border border-success/20">
-                Check your email for the confirmation link!
+                {t('successMessage')}
               </div>
               <Button asChild className="w-full">
-                <Link href="/login">Go to Sign In</Link>
+                <Link href="/login">{t('goToLogin')}</Link>
               </Button>
             </div>
           ) : (
@@ -68,7 +70,7 @@ export default function SignupPage() {
                 </div>
               )}
               <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -83,7 +85,7 @@ export default function SignupPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -96,19 +98,19 @@ export default function SignupPage() {
                   aria-describedby="password-error"
                   autoComplete="new-password"
                 />
-                <p className="text-xs text-muted-foreground">At least 6 characters</p>
+                <p className="text-xs text-muted-foreground">{t('passwordHint')}</p>
               </div>
               <Button type="submit" className="w-full mt-2" disabled={loading}>
-                {loading ? 'Creating account...' : 'Create Account'}
+                {loading ? t('submitting') : t('submit')}
               </Button>
             </form>
           )}
         </div>
 
         <p className="text-sm text-center text-muted-foreground mt-6">
-          Already have an account?{' '}
+          {t('haveAccount')}{' '}
           <Link href="/login" className="text-primary hover:underline font-medium">
-            Sign in
+            {t('signIn')}
           </Link>
         </p>
       </div>

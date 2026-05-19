@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { PhotoDisplay } from '@/components/ui/photo-display'
 import type { Pet } from '@/types/pet'
 
@@ -7,6 +10,8 @@ interface PetCardProps {
 }
 
 export function PetCard({ pet }: PetCardProps) {
+  const t = useTranslations('petCard')
+
   return (
     <Link
       href={`/dashboard/pets/${pet.id}`}
@@ -31,7 +36,7 @@ export function PetCard({ pet }: PetCardProps) {
           {/* "View Details" — hover indicator (also satisfies accessibility) */}
           <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-sm text-foreground">
-              View Details →
+              {t('viewDetails')} →
             </span>
           </div>
 

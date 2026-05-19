@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { usePets } from '@/hooks/usePets'
 import { PetCard } from '@/components/pet/PetCard'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
 export default function DashboardPage() {
+  const t = useTranslations('dashboard')
   const { pets, isLoading, error, loadPets } = usePets()
 
   useEffect(() => {
@@ -19,15 +21,15 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="font-heading text-3xl font-semibold text-foreground">My Pets</h1>
+          <h1 className="font-heading text-3xl font-semibold text-foreground">{t('title')}</h1>
           {!isLoading && !error && pets.length > 0 && (
             <p className="text-muted-foreground mt-1">
-              {pets.length} {pets.length === 1 ? 'companion' : 'companions'} registered
+              {t('companions', { count: pets.length })}
             </p>
           )}
         </div>
         <Button asChild>
-          <Link href="/dashboard/pets/new">Add New Pet</Link>
+          <Link href="/dashboard/pets/new">{t('addPet')}</Link>
         </Button>
       </div>
 
@@ -48,26 +50,15 @@ export default function DashboardPage() {
       ) : pets.length === 0 ? (
         <Card className="border-dashed">
           <EmptyState
-            message="You haven't added any pets yet"
+            message={t('emptyMessage')}
             icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-14 w-14 mx-auto"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.2}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             }
             action={
               <Button asChild>
-                <Link href="/dashboard/pets/new">Add Your First Pet</Link>
+                <Link href="/dashboard/pets/new">{t('addFirstPet')}</Link>
               </Button>
             }
           />

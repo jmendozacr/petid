@@ -1,0 +1,167 @@
+{
+  "nav": {
+    "signOut": "Sign Out"
+  },
+  "landing": {
+    "headline": "Every pet deserves an identity.",
+    "description": "Create a digital profile for your pet, generate a QR code, and help them find their way home if they ever get lost.",
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "features": {
+      "healthRecords": "Health records",
+      "qrId": "QR identification",
+      "lostAlerts": "Lost pet alerts",
+      "emergency": "Emergency contacts"
+    }
+  },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to manage your pets",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign In",
+    "submitting": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "createOne": "Create one"
+  },
+  "signup": {
+    "title": "Create account",
+    "subtitle": "Start managing your pets today",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 6 characters",
+    "submit": "Create Account",
+    "submitting": "Creating account...",
+    "successMessage": "Check your email for the confirmation link!",
+    "goToLogin": "Go to Sign In",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
+  "dashboard": {
+    "title": "My Pets",
+    "companions": "{count, plural, one {# companion registered} other {# companions registered}}",
+    "addPet": "Add New Pet",
+    "addFirstPet": "Add Your First Pet",
+    "emptyMessage": "You haven't added any pets yet"
+  },
+  "petCard": {
+    "viewDetails": "View Details"
+  },
+  "newPet": {
+    "title": "Add New Pet",
+    "subtitle": "Enter your pet's information",
+    "cancel": "Cancel",
+    "submit": "Save Pet",
+    "submitting": "Saving..."
+  },
+  "petDetail": {
+    "deletePet": "Delete Pet",
+    "markAsLost": "Mark as Lost",
+    "markAsFound": "Mark as Found",
+    "updating": "Updating...",
+    "lostSince": "Lost since: {date}",
+    "confirmLostTitle": "Mark as Lost?",
+    "confirmLostDescription": "This will show a LOST PET banner on your pet's public page so anyone who finds them knows to contact you.",
+    "confirmLostAction": "Yes, mark as lost",
+    "confirmFoundTitle": "Mark as Found?",
+    "confirmFoundDescription": "This will remove the LOST PET banner from your pet's public page.",
+    "confirmFoundAction": "Yes, mark as found",
+    "cancel": "Cancel",
+    "uploadPhoto": "Upload Photo",
+    "uploading": "Uploading...",
+    "qrTitle": "QR Code",
+    "qrSubtitle": "Scan this to view pet info publicly",
+    "copyLink": "Copy Link",
+    "downloadQR": "Download QR",
+    "downloading": "Downloading...",
+    "healthTitle": "Health Records",
+    "addRecord": "Add Record",
+    "vaccines": "Vaccines",
+    "allergies": "Allergies",
+    "medicalNotes": "Medical Notes",
+    "noRecords": "No health records yet",
+    "fieldBirthdate": "Birthdate",
+    "fieldColor": "Color",
+    "fieldWeight": "Weight",
+    "fieldMicrochip": "Microchip",
+    "fieldPhone": "Phone",
+    "fieldEmergency": "Emergency",
+    "toastMarkedLost": "Pet marked as lost.",
+    "toastMarkedFound": "Pet marked as found!",
+    "toastToggleError": "Failed to update lost status. Please try again.",
+    "toastQrDownloaded": "Downloaded {filename}",
+    "toastQrError": "Failed to download QR code: {error}",
+    "toastDeleteError": "Failed to delete pet",
+    "toastRecordError": "Failed to delete record",
+    "notFound": "Pet not found",
+    "backToDashboard": "Back to Dashboard",
+    "deleteTitle": "Delete Pet"
+  },
+  "publicPet": {
+    "lostTitle": "LOST PET",
+    "lostSince": "Missing since {date}",
+    "reportLink": "I found this pet — report here",
+    "ownerContact": "Owner Contact",
+    "emergencyContact": "Emergency Contact",
+    "allergies": "⚠️ Allergies",
+    "medicalNotes": "Medical Notes",
+    "microchipId": "Microchip ID",
+    "reportButton": "Report Found Pet",
+    "poweredBy": "Powered by"
+  },
+  "reportFound": {
+    "title": "Report Found Pet",
+    "subtitle": "Let the owner know you found their pet",
+    "message": "Message",
+    "messagePlaceholder": "Where did you find the pet? Any details...",
+    "location": "Location",
+    "locationPlaceholder": "Street, neighborhood, city...",
+    "contact": "Your Contact (optional)",
+    "contactPlaceholder": "Phone or email...",
+    "submit": "Submit Report",
+    "submitting": "Sending...",
+    "successTitle": "Report Submitted!",
+    "successDescription": "Thank you for reporting this pet. The owner will be notified.",
+    "backToPet": "Back to Pet",
+    "back": "Back"
+  },
+  "petForm": {
+    "name": "Name",
+    "nameRequired": "Name *",
+    "namePlaceholder": "Your pet's name",
+    "species": "Species",
+    "speciesPlaceholder": "Dog, Cat, Bird...",
+    "breed": "Breed",
+    "breedPlaceholder": "Golden Retriever...",
+    "birthdate": "Birthdate",
+    "color": "Color",
+    "colorPlaceholder": "Brown, White...",
+    "weight": "Weight (kg)",
+    "microchip": "Microchip ID",
+    "ownerPhone": "Owner Phone",
+    "emergencyContact": "Emergency Contact"
+  },
+  "healthRecord": {
+    "addTitle": "Add Health Record",
+    "type": "Type",
+    "vaccine": "Vaccine",
+    "allergy": "Allergy",
+    "medicalNote": "Medical Note",
+    "date": "Date",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter details...",
+    "save": "Save Record",
+    "descriptionRequired": "Description is required",
+    "delete": "Delete"
+  },
+  "deleteConfirm": {
+    "description": "Are you sure you want to delete {name}? This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting..."
+  },
+  "language": {
+    "en": "EN",
+    "es": "ES"
+  }
+}

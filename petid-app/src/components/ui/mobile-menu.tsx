@@ -1,14 +1,53 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 import { Button } from '@/components/ui/button'
+import { setLocale } from '@/app/actions/set-locale'
+import type { Locale } from '@/i18n/config'
 
 interface MobileMenuProps {
   email: string
   signOutAction: () => Promise<void>
 }
 
+function LocaleSwitcher() {
+  const t = useTranslations('language')
+  const locale = useLocale()
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
+  function switchLocale(next: Locale) {
+    startTransition(async () => {
+      await setLocale(next)
+      router.refresh()
+    })
+  }
+
+  return (
+    <div className="flex items-center gap-1 rounded-lg bg-muted p-1 border border-border">
+      {(['en', 'es'] as Locale[]).map((l) => (
+        <button
+          key={l}
+          onClick={() => switchLocale(l)}
+          disabled={isPending || locale === l}
+          className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors ${
+            locale === l
+              ? 'bg-primary text-primary-foreground shadow-warm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+          aria-pressed={locale === l}
+        >
+          {t(l as 'en' | 'es')}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export function MobileMenu({ email, signOutAction }: MobileMenuProps) {
+  const t = useTranslations('nav')
   const [open, setOpen] = useState(false)
 
   return (
@@ -18,9 +57,10 @@ export function MobileMenu({ email, signOutAction }: MobileMenuProps) {
         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full border border-border truncate max-w-[200px]">
           {email}
         </span>
+        <LocaleSwitcher />
         <form action={signOutAction}>
           <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-            Sign Out
+            {t('signOut')}
           </Button>
         </form>
       </div>
@@ -49,7 +89,6 @@ export function MobileMenu({ email, signOutAction }: MobileMenuProps) {
       {/* Mobile dropdown */}
       {open && (
         <>
-          {/* Backdrop — closes on tap outside */}
           <div
             className="sm:hidden fixed inset-0 z-30"
             onClick={() => setOpen(false)}
@@ -63,9 +102,10 @@ export function MobileMenu({ email, signOutAction }: MobileMenuProps) {
           >
             <div className="px-4 py-5 space-y-4">
               <p className="text-sm text-muted-foreground truncate">{email}</p>
+              <LocaleSwitcher />
               <form action={signOutAction}>
                 <Button type="submit" variant="outline" className="w-full" onClick={() => setOpen(false)}>
-                  Sign Out
+                  {t('signOut')}
                 </Button>
               </form>
             </div>

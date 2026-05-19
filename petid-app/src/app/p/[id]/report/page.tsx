@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useReportForm } from '@/hooks/useReportForm'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ReportFoundPetPage() {
+  const t = useTranslations('reportFound')
   const params = useParams()
   const router = useRouter()
   const petId = params.id as string
@@ -25,14 +27,14 @@ export default function ReportFoundPetPage() {
       <div className="min-h-screen bg-background p-4 flex items-center justify-center">
         <Card className="max-w-md w-full">
           <CardHeader>
-            <CardTitle className="text-center text-success">Report Submitted!</CardTitle>
+            <CardTitle className="text-center text-success">{t('successTitle')}</CardTitle>
             <CardDescription className="text-center">
-              Thank you for reporting this pet. The owner will be notified.
+              {t('successDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => router.push(`/p/${petId}`)} className="w-full">
-              Back to Pet
+              {t('backToPet')}
             </Button>
           </CardContent>
         </Card>
@@ -44,15 +46,13 @@ export default function ReportFoundPetPage() {
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-md mx-auto space-y-4">
         <Button variant="outline" onClick={() => router.back()}>
-          Back
+          {t('back')}
         </Button>
 
         <Card>
           <CardHeader>
-            <CardTitle>Report Found Pet</CardTitle>
-            <CardDescription>
-              Let the owner know you found their pet
-            </CardDescription>
+            <CardTitle>{t('title')}</CardTitle>
+            <CardDescription>{t('subtitle')}</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
@@ -63,41 +63,41 @@ export default function ReportFoundPetPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="message">Message *</Label>
+                <Label htmlFor="message">{t('message')} *</Label>
                 <textarea
                   id="message"
                   value={formData.message}
                   onChange={(e) => handleChange('message', e.target.value)}
-                  placeholder="Where did you find the pet? Any details..."
+                  placeholder={t('messagePlaceholder')}
                   className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="location">{t('location')}</Label>
                 <Input
                   id="location"
                   value={formData.location}
                   onChange={(e) => handleChange('location', e.target.value)}
-                  placeholder="Street, neighborhood, city..."
+                  placeholder={t('locationPlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contact">Your Contact (optional)</Label>
+                <Label htmlFor="contact">{t('contact')}</Label>
                 <Input
                   id="contact"
                   type="tel"
                   value={formData.contact}
                   onChange={(e) => handleChange('contact', e.target.value)}
-                  placeholder="Phone or email..."
+                  placeholder={t('contactPlaceholder')}
                 />
               </div>
             </CardContent>
             <div className="p-6 pt-0">
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Sending...' : 'Submit Report'}
+                {loading ? t('submitting') : t('submit')}
               </Button>
             </div>
           </form>

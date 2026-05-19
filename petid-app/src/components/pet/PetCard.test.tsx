@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@/test/test-utils'
 import { PetCard } from './PetCard'
 import type { Pet } from '@/types/pet'
 

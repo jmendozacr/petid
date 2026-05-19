@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { getTranslations, getLocale } from 'next-intl/server'
 import { PhotoDisplay } from '@/components/ui/photo-display'
 import { QRCode } from '@/components/qr-code'
 import { Button } from '@/components/ui/button'
@@ -29,7 +30,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default async function PublicPetPage({ params }: PageProps) {
   const { id: petId } = await params
-  const supabase = await createClient()
+  const [t, locale, supabase] = await Promise.all([
+    getTranslations('publicPet'),
+    getLocale(),
+    createClient(),
+  ])
 
   const [{ data: pet }, { data: records }] = await Promise.all([
     supabase.from('pets').select('*').eq('id', petId).single(),
@@ -64,20 +69,20 @@ export default async function PublicPetPage({ params }: PageProps) {
           <div className="bg-danger text-danger-foreground rounded-2xl p-5 shadow-warm-md animate-scale-in">
             <div className="flex items-center gap-2.5 mb-1">
               <span className="text-2xl" role="img" aria-label="Alert">🚨</span>
-              <p className="font-heading text-2xl font-bold tracking-tight">LOST PET</p>
+              <p className="font-heading text-2xl font-bold tracking-tight">{t('lostTitle')}</p>
             </div>
             {pet.lost_since && (
               <p className="text-sm opacity-85 mb-4">
-                Missing since {new Date(pet.lost_since).toLocaleDateString('en-US', {
+                {t('lostSince', { date: new Date(pet.lost_since).toLocaleDateString(locale, {
                   month: 'long', day: 'numeric', year: 'numeric'
-                })}
+                }) })}
               </p>
             )}
             <a
               href={`/p/${pet.id}/report`}
               className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 transition-colors rounded-xl px-4 py-2.5 text-sm font-medium"
             >
-              📍 I found this pet — report here
+              📍 {t('reportLink')}
             </a>
           </div>
         )}
@@ -93,7 +98,7 @@ export default async function PublicPetPage({ params }: PageProps) {
         {/* Owner contact */}
         {pet.owner_phone && (
           <SectionCard>
-            <SectionLabel>Owner Contact</SectionLabel>
+            <SectionLabel>{t('ownerContact')}</SectionLabel>
             <a
               href={`tel:${pet.owner_phone}`}
               className="text-xl font-medium text-foreground hover:text-primary transition-colors"
@@ -106,7 +111,7 @@ export default async function PublicPetPage({ params }: PageProps) {
         {/* Emergency contact */}
         {pet.emergency_contact && (
           <SectionCard className="border-danger/30 bg-danger/5">
-            <SectionLabel>Emergency Contact</SectionLabel>
+            <SectionLabel>{t('emergencyContact')}</SectionLabel>
             <a
               href={`tel:${pet.emergency_contact}`}
               className="text-xl font-medium text-danger hover:text-danger/80 transition-colors"
@@ -119,7 +124,7 @@ export default async function PublicPetPage({ params }: PageProps) {
         {/* Allergies */}
         {allergies.length > 0 && (
           <SectionCard className="border-danger/30">
-            <SectionLabel>⚠️ Allergies</SectionLabel>
+            <SectionLabel>{t('allergies')}</SectionLabel>
             <div className="space-y-2">
               {allergies.map((allergy) => (
                 <div key={allergy.id} className="flex items-start justify-between gap-3 p-3 bg-danger/8 rounded-xl">
@@ -134,7 +139,7 @@ export default async function PublicPetPage({ params }: PageProps) {
         {/* Medical notes */}
         {medicalNotes.length > 0 && (
           <SectionCard>
-            <SectionLabel>Medical Notes</SectionLabel>
+            <SectionLabel>{t('medicalNotes')}</SectionLabel>
             <div className="space-y-2">
               {medicalNotes.map((note) => (
                 <div key={note.id} className="flex items-start justify-between gap-3 p-3 bg-muted rounded-xl">
@@ -149,7 +154,7 @@ export default async function PublicPetPage({ params }: PageProps) {
         {/* Microchip */}
         {pet.microchip_id && (
           <SectionCard>
-            <SectionLabel>Microchip ID</SectionLabel>
+            <SectionLabel>{t('microchipId')}</SectionLabel>
             <p className="font-mono text-lg text-foreground tracking-wide">{pet.microchip_id}</p>
           </SectionCard>
         )}
@@ -158,13 +163,13 @@ export default async function PublicPetPage({ params }: PageProps) {
         {!pet.is_lost && (
           <Button asChild className="w-full" variant="outline">
             <Link href={`/p/${pet.id}/report`}>
-              📍 Report Found Pet
+              📍 {t('reportButton')}
             </Link>
           </Button>
         )}
 
         <p className="text-center text-xs text-muted-foreground pt-4">
-          Powered by <span className="font-heading font-semibold text-primary">PetID</span>
+          {t('poweredBy')} <span className="font-heading font-semibold text-primary">PetID</span>
         </p>
       </div>
     </div>

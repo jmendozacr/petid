@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { Button } from '@/components/ui/button'
 
 function PawIcon({ className }: { className?: string }) {
@@ -13,9 +14,16 @@ function PawIcon({ className }: { className?: string }) {
   )
 }
 
-const features = ['Health records', 'QR identification', 'Lost pet alerts', 'Emergency contacts']
+export default async function Home() {
+  const t = await getTranslations('landing')
 
-export default function Home() {
+  const features = [
+    t('features.healthRecords'),
+    t('features.qrId'),
+    t('features.lostAlerts'),
+    t('features.emergency'),
+  ]
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Content panel */}
@@ -27,18 +35,18 @@ export default function Home() {
           </div>
 
           <h1 className="font-heading text-5xl lg:text-6xl font-semibold text-foreground leading-[1.1] mb-6">
-            Every pet deserves an identity.
+            {t('headline')}
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed mb-10">
-            Create a digital profile for your pet, generate a QR code, and help them find their way home if they ever get lost.
+            {t('description')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mb-12">
             <Button asChild size="lg" className="font-medium">
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">{t('signIn')}</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="font-medium">
-              <Link href="/signup">Create Account</Link>
+              <Link href="/signup">{t('createAccount')}</Link>
             </Button>
           </div>
 

@@ -2,12 +2,14 @@
 
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { usePetForm } from '@/hooks/usePetForm'
 import { PetFormFields } from '@/components/pet/PetFormFields'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 
 export default function NewPetPage() {
+  const t = useTranslations('newPet')
   const router = useRouter()
   const { formData, loading, error, handleChange, submit } = usePetForm()
 
@@ -23,8 +25,8 @@ export default function NewPetPage() {
     <div className="max-w-2xl mx-auto">
       <Card>
         <CardHeader>
-          <CardTitle>Add New Pet</CardTitle>
-          <CardDescription>Enter your pet&apos;s information</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('subtitle')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -32,10 +34,10 @@ export default function NewPetPage() {
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button type="button" variant="outline" onClick={() => router.back()}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Pet'}
+              {loading ? t('submitting') : t('submit')}
             </Button>
           </CardFooter>
         </form>

@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { PetFormData } from '@/hooks/usePetForm'
@@ -9,6 +12,8 @@ interface PetFormFieldsProps {
 }
 
 export function PetFormFields({ formData, onChange, error }: PetFormFieldsProps) {
+  const t = useTranslations('petForm')
+
   return (
     <>
       {error && (
@@ -16,43 +21,43 @@ export function PetFormFields({ formData, onChange, error }: PetFormFieldsProps)
           {error}
         </div>
       )}
-      
+
       <div className="space-y-2">
-        <Label htmlFor="name">Name *</Label>
+        <Label htmlFor="name">{t('nameRequired')}</Label>
         <Input
           id="name"
           value={formData.name}
           onChange={(e) => onChange('name', e.target.value)}
           required
-          placeholder="Your pet's name"
+          placeholder={t('namePlaceholder')}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="species">Species</Label>
+          <Label htmlFor="species">{t('species')}</Label>
           <Input
             id="species"
             value={formData.species}
             onChange={(e) => onChange('species', e.target.value)}
-            placeholder="Dog, Cat, Bird..."
+            placeholder={t('speciesPlaceholder')}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="breed">Breed</Label>
+          <Label htmlFor="breed">{t('breed')}</Label>
           <Input
             id="breed"
             value={formData.breed}
             onChange={(e) => onChange('breed', e.target.value)}
-            placeholder="Golden Retriever..."
+            placeholder={t('breedPlaceholder')}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="birthdate">Birthdate</Label>
+          <Label htmlFor="birthdate">{t('birthdate')}</Label>
           <Input
             id="birthdate"
             type="date"
@@ -62,19 +67,19 @@ export function PetFormFields({ formData, onChange, error }: PetFormFieldsProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="color">Color</Label>
+          <Label htmlFor="color">{t('color')}</Label>
           <Input
             id="color"
             value={formData.color}
             onChange={(e) => onChange('color', e.target.value)}
-            placeholder="Brown, White..."
+            placeholder={t('colorPlaceholder')}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="weight">Weight (kg)</Label>
+          <Label htmlFor="weight">{t('weight')}</Label>
           <Input
             id="weight"
             type="number"
@@ -86,7 +91,7 @@ export function PetFormFields({ formData, onChange, error }: PetFormFieldsProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="microchip_id">Microchip ID</Label>
+          <Label htmlFor="microchip_id">{t('microchip')}</Label>
           <Input
             id="microchip_id"
             value={formData.microchip_id}
@@ -98,7 +103,7 @@ export function PetFormFields({ formData, onChange, error }: PetFormFieldsProps)
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="owner_phone">Owner Phone</Label>
+          <Label htmlFor="owner_phone">{t('ownerPhone')}</Label>
           <Input
             id="owner_phone"
             type="tel"
@@ -109,12 +114,12 @@ export function PetFormFields({ formData, onChange, error }: PetFormFieldsProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="emergency_contact">Emergency Contact</Label>
+          <Label htmlFor="emergency_contact">{t('emergencyContact')}</Label>
           <Input
             id="emergency_contact"
             value={formData.emergency_contact}
             onChange={(e) => onChange('emergency_contact', e.target.value)}
-            placeholder="Vet&apos;s phone..."
+            placeholder="Vet's phone..."
           />
         </div>
       </div>

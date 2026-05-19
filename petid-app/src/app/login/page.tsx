@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,6 +23,7 @@ function PawIcon({ className }: { className?: string }) {
 
 export default function LoginPage() {
   const router = useRouter()
+  const t = useTranslations('login')
   const { loading, error, signIn, clearError } = useAuth()
 
   const [email, setEmail] = useState('')
@@ -47,8 +49,8 @@ export default function LoginPage() {
             <PawIcon className="h-6 w-6 text-primary" />
             <span className="font-heading text-lg font-semibold tracking-tight">PetID</span>
           </Link>
-          <h1 className="font-heading text-3xl font-semibold text-foreground">Welcome back</h1>
-          <p className="text-muted-foreground mt-1.5">Sign in to manage your pets</p>
+          <h1 className="font-heading text-3xl font-semibold text-foreground">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1.5">{t('subtitle')}</p>
         </div>
 
         <div className="bg-card rounded-2xl border border-border shadow-warm-md p-8">
@@ -59,7 +61,7 @@ export default function LoginPage() {
               </div>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -74,7 +76,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -88,15 +90,15 @@ export default function LoginPage() {
               />
             </div>
             <Button type="submit" className="w-full mt-2" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? t('submitting') : t('submit')}
             </Button>
           </form>
         </div>
 
         <p className="text-sm text-center text-muted-foreground mt-6">
-          Don&apos;t have an account?{' '}
+          {t('noAccount')}{' '}
           <Link href="/signup" className="text-primary hover:underline font-medium">
-            Create one
+            {t('createOne')}
           </Link>
         </p>
       </div>
