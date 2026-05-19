@@ -32,10 +32,10 @@ function LocaleSwitcher() {
           key={l}
           onClick={() => switchLocale(l)}
           disabled={isPending || locale === l}
-          className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors ${
+          className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer ${
             locale === l
               ? 'bg-primary text-primary-foreground shadow-warm'
-              : 'text-muted-foreground hover:text-foreground'
+              : 'text-muted-foreground hover:bg-accent hover:text-foreground'
           }`}
           aria-pressed={locale === l}
         >
