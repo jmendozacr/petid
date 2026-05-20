@@ -20,3 +20,6 @@ skills-lock.json
 petid-app/src/app/test/
 
 .vercel
+
+# Supabase CLI temp files
+supabase/.temp/
