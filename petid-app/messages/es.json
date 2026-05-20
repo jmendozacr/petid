@@ -1,6 +1,7 @@
 {
   "nav": {
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "settings": "Configuración"
   },
   "landing": {
     "headline": "Cada mascota merece una identidad.",

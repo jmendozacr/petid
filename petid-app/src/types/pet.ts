@@ -13,6 +13,8 @@ export type Pet = {
   emergency_contact: string | null
   is_lost: boolean
   lost_since: string | null
+  lost_lat: number | null
+  lost_lng: number | null
   created_at: string
 }
 

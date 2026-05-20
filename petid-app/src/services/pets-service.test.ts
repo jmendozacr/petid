@@ -48,6 +48,8 @@ const mockPet: Pet = {
   emergency_contact: '+0987654321',
   is_lost: false,
   lost_since: null,
+  lost_lat: null,
+  lost_lng: null,
   created_at: '2024-01-01T00:00:00Z',
 }
 

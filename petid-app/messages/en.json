@@ -1,6 +1,7 @@
 {
   "nav": {
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "settings": "Settings"
   },
   "landing": {
     "headline": "Every pet deserves an identity.",

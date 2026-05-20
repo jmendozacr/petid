@@ -6,7 +6,8 @@ import type { Pet } from '@/types/pet'
 
 export async function toggleLostPetStatus(
   petId: string,
-  isLost: boolean
+  isLost: boolean,
+  coords?: { lat: number; lng: number } | null
 ): Promise<{ success: boolean; pet?: Pet; error?: string }> {
   const supabase = await createClient()
 
@@ -30,10 +31,15 @@ export async function toggleLostPetStatus(
   }
 
   try {
-    // Invariant: lost_since must be null when is_lost is false
+    // Invariant: lost_since/lost_lat/lost_lng must be null when is_lost is false
     const update = isLost
-      ? { is_lost: true, lost_since: new Date().toISOString() }
-      : { is_lost: false, lost_since: null }
+      ? {
+          is_lost: true,
+          lost_since: new Date().toISOString(),
+          lost_lat: coords?.lat ?? null,
+          lost_lng: coords?.lng ?? null,
+        }
+      : { is_lost: false, lost_since: null, lost_lat: null, lost_lng: null }
 
     const { data: updated, error } = await supabase
       .from('pets')

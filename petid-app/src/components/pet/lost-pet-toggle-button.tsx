@@ -16,12 +16,12 @@ interface LostPetToggleButtonProps {
 
 export function LostPetToggleButton({ petId, isLost, lostSince, onToggled }: LostPetToggleButtonProps) {
   const t = useTranslations('petDetail')
-  const { isLoading, toggle } = useLostPetToggle(petId)
+  const { isLoading, isGeoLoading, toggle } = useLostPetToggle(petId)
   const [showConfirm, setShowConfirm] = useState(false)
 
   async function handleConfirm() {
-    setShowConfirm(false)
     const pet = await toggle(!isLost)
+    setShowConfirm(false)
     if (pet) {
       toast.success(isLost ? t('toastMarkedFound') : t('toastMarkedLost'))
       onToggled?.(pet)
@@ -39,7 +39,7 @@ export function LostPetToggleButton({ petId, isLost, lostSince, onToggled }: Los
       <div className="space-y-1">
         <Button
           variant={isLost ? 'success' : 'destructive'}
-          disabled={isLoading}
+          disabled={isLoading || isGeoLoading}
           onClick={handleClick}
         >
           {isLoading ? t('updating') : isLost ? t('markAsFound') : t('markAsLost')}
@@ -64,6 +64,11 @@ export function LostPetToggleButton({ petId, isLost, lostSince, onToggled }: Los
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {isLost ? t('confirmFoundDescription') : t('confirmLostDescription')}
               </p>
+              {!isLost && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  We&apos;ll use your location to alert nearby users. Location access is optional.
+                </p>
+              )}
             </div>
             <div className="flex gap-3 px-6 pb-6">
               <Button
@@ -78,9 +83,15 @@ export function LostPetToggleButton({ petId, isLost, lostSince, onToggled }: Los
                 variant={isLost ? 'success' : 'destructive'}
                 className="flex-1"
                 onClick={handleConfirm}
-                disabled={isLoading}
+                disabled={isLoading || isGeoLoading}
               >
-                {isLoading ? t('updating') : isLost ? t('confirmFoundAction') : t('confirmLostAction')}
+                {isGeoLoading && !isLost
+                  ? 'Getting location...'
+                  : isLoading
+                  ? t('updating')
+                  : isLost
+                  ? t('confirmFoundAction')
+                  : t('confirmLostAction')}
               </Button>
             </div>
           </div>

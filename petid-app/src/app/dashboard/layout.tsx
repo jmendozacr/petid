@@ -49,7 +49,7 @@ export default async function DashboardLayout({
           </Link>
 
           <nav aria-label="Main navigation">
-            <MobileMenu email={user.email!} signOutAction={handleSignOut} />
+            <MobileMenu email={user.email!} signOutAction={handleSignOut} settingsHref="/dashboard/settings" />
           </nav>
         </div>
       </header>

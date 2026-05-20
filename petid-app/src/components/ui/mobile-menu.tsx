@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { setLocale } from '@/app/actions/set-locale'
@@ -10,6 +11,7 @@ import type { Locale } from '@/i18n/config'
 interface MobileMenuProps {
   email: string
   signOutAction: () => Promise<void>
+  settingsHref?: string
 }
 
 function LocaleSwitcher() {
@@ -46,7 +48,7 @@ function LocaleSwitcher() {
   )
 }
 
-export function MobileMenu({ email, signOutAction }: MobileMenuProps) {
+export function MobileMenu({ email, signOutAction, settingsHref }: MobileMenuProps) {
   const t = useTranslations('nav')
   const [open, setOpen] = useState(false)
 
@@ -57,6 +59,14 @@ export function MobileMenu({ email, signOutAction }: MobileMenuProps) {
         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full border border-border truncate max-w-[200px]">
           {email}
         </span>
+        {settingsHref && (
+          <Link
+            href={settingsHref}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+          >
+            {t('settings')}
+          </Link>
+        )}
         <LocaleSwitcher />
         <form action={signOutAction}>
           <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
@@ -102,6 +112,15 @@ export function MobileMenu({ email, signOutAction }: MobileMenuProps) {
           >
             <div className="px-4 py-5 space-y-4">
               <p className="text-sm text-muted-foreground truncate">{email}</p>
+              {settingsHref && (
+                <Link
+                  href={settingsHref}
+                  className="block text-sm text-foreground hover:text-primary transition-colors py-1"
+                  onClick={() => setOpen(false)}
+                >
+                  {t('settings')}
+                </Link>
+              )}
               <LocaleSwitcher />
               <form action={signOutAction}>
                 <Button type="submit" variant="outline" className="w-full" onClick={() => setOpen(false)}>

@@ -37,7 +37,11 @@ export default async function PublicPetPage({ params }: PageProps) {
   ])
 
   const [{ data: pet }, { data: records }] = await Promise.all([
-    supabase.from('pets').select('*').eq('id', petId).single(),
+    supabase
+      .from('pets')
+      .select('id, user_id, name, species, breed, birthdate, color, weight, microchip_id, photo_url, owner_phone, emergency_contact, is_lost, lost_since')
+      .eq('id', petId)
+      .single(),
     supabase
       .from('health_records')
       .select('*')
