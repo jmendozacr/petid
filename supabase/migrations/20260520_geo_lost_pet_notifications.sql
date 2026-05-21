@@ -88,9 +88,9 @@ SECURITY DEFINER
 AS $$
 BEGIN
   IF NEW.is_lost = true AND (OLD.is_lost IS DISTINCT FROM true) THEN
-    PERFORM extensions.http_post(
-      url     := 'https://judarnzcbuidbberzhtu.supabase.co/functions/v1/notify-lost-pet',
-      body    := json_build_object('record', row_to_json(NEW))::text,
+    PERFORM net.http_post(
+      url     := 'https://judarnzcbuidbberzhtu.supabase.co/functions/v1/notify-lost-pet'::text,
+      body    := json_build_object('record', row_to_json(NEW))::jsonb,
       headers := jsonb_build_object(
         'Content-Type',  'application/json',
         'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1ZGFybnpjYnVpZGJiZXJ6aHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NDUwODYsImV4cCI6MjA4ODQyMTA4Nn0.PLIPmicH6XuNc2GqwWDs16X5pKDMhixArGwUFvzDG_0'
