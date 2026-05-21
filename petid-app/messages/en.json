@@ -161,6 +161,17 @@
     "delete": "Delete",
     "deleting": "Deleting..."
   },
+  "settings": {
+    "title": "Settings",
+    "nearbyAlertsTitle": "Nearby Lost Pet Alerts",
+    "nearbyAlertsDescription": "Get an email when a pet is reported lost within 5 km of your saved location.",
+    "alertLocationTitle": "Your Alert Location",
+    "alertLocationDescription": "We use this location to find lost pets near you. We never share your exact location.",
+    "useCurrentLocation": "Use my current location",
+    "savingLocation": "Saving location...",
+    "locationDenied": "Location access was denied. Please enable it in your browser settings.",
+    "lastUpdated": "Last updated: {date}"
+  },
   "language": {
     "en": "EN",
     "es": "ES"

@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useNotificationSettings } from '@/hooks/useNotificationSettings'
 import { getCurrentPosition } from '@/lib/geolocation'
 
 export default function SettingsPage() {
+  const t = useTranslations('settings')
   const { settings, isLoading, isSaving, toggleOptIn, saveAlertLocation } =
     useNotificationSettings()
   const [geoLoading, setGeoLoading] = useState(false)
@@ -19,7 +21,7 @@ export default function SettingsPage() {
     setGeoLoading(false)
 
     if (!coords) {
-      setGeoError('Location access was denied. Please enable it in your browser settings.')
+      setGeoError(t('locationDenied'))
       return
     }
 
@@ -28,15 +30,15 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-xl space-y-6">
-      <h1 className="font-heading text-3xl font-bold text-foreground">Settings</h1>
+      <h1 className="font-heading text-3xl font-bold text-foreground">{t('title')}</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Nearby Lost Pet Alerts</CardTitle>
+          <CardTitle className="text-lg">{t('nearbyAlertsTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Get an email when a pet is reported lost within 5 km of your saved location.
+            {t('nearbyAlertsDescription')}
           </p>
           {isLoading ? (
             <div className="h-8 w-14 rounded-full bg-muted animate-pulse" />
@@ -62,25 +64,27 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Your Alert Location</CardTitle>
+          <CardTitle className="text-lg">{t('alertLocationTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            We use this location to find lost pets near you. We never share your exact location.
+            {t('alertLocationDescription')}
           </p>
           <Button
             variant="outline"
             disabled={geoLoading || isSaving}
             onClick={handleUseCurrentLocation}
           >
-            {geoLoading || isSaving ? 'Saving location...' : 'Use my current location'}
+            {geoLoading || isSaving ? t('savingLocation') : t('useCurrentLocation')}
           </Button>
           {geoError && (
             <p className="text-sm text-danger">{geoError}</p>
           )}
           {settings?.notification_location_updated_at && (
             <p className="text-sm text-muted-foreground">
-              Last updated: {new Date(settings.notification_location_updated_at).toLocaleDateString()}
+              {t('lastUpdated', {
+                date: new Date(settings.notification_location_updated_at).toLocaleDateString(),
+              })}
             </p>
           )}
         </CardContent>
