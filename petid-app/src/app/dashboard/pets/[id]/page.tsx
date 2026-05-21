@@ -24,13 +24,14 @@ export default function PetDetailPage() {
   const router = useRouter()
   const petId = params.id as string
 
-  const { pet, loading: petLoading, error: petError, update, remove, uploadPhoto, reload } = usePet(petId)
+  const { pet, loading: petLoading, error: petError, update, remove, uploadPhoto, reload, applyUpdate } = usePet(petId)
   const { vaccines, allergies, medicalNotes, add, remove: removeRecord, loading: recordsLoading } = useHealthRecords(petId)
   const { updatePet } = usePetStore()
 
   const handleToggled = useCallback((updatedPet: Pet) => {
+    applyUpdate(updatedPet)
     updatePet(updatedPet)
-  }, [updatePet])
+  }, [applyUpdate, updatePet])
 
   const [showAddRecord, setShowAddRecord] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)

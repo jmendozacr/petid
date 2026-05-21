@@ -49,6 +49,8 @@ export function usePet(petId: string) {
     return photoUrl
   }, [petId, update])
 
+  const applyUpdate = useCallback((updated: Pet) => setPet(updated), [])
+
   return {
     pet,
     loading,
@@ -57,5 +59,6 @@ export function usePet(petId: string) {
     remove,
     uploadPhoto,
     reload: loadPet,
+    applyUpdate,
   }
 }
