@@ -66,21 +66,20 @@ export function useAuth() {
     setError(null)
 
     try {
-      const { data, error: authError } = await supabase.auth.signUp({
+      const { error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: fullName,
+            phone: phone || null,
+          },
+        },
       })
 
       if (authError) {
         setError(authError.message)
         return { success: false }
-      }
-
-      if (data?.user) {
-        await updateProfile(data.user.id, {
-          full_name: fullName,
-          phone: phone || null,
-        })
       }
 
       return { success: true }
