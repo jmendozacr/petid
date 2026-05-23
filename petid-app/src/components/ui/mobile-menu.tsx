@@ -158,16 +158,17 @@ export function MobileMenu({ email, signOutAction, settingsHref }: MobileMenuPro
               <div className="h-px bg-border mx-3" />
 
               <div className="py-1.5">
-                <form action={signOutAction}>
-                  <button
-                    type="submit"
-                    onClick={() => setOpen(false)}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger hover:bg-danger/8 transition-colors duration-150 cursor-pointer"
-                  >
-                    <SignOutIcon />
-                    {t('signOut')}
-                  </button>
-                </form>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setOpen(false)
+                    await signOutAction()
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger hover:bg-danger/8 transition-colors duration-150 cursor-pointer"
+                >
+                  <SignOutIcon />
+                  {t('signOut')}
+                </button>
               </div>
             </div>
           </>
@@ -220,11 +221,17 @@ export function MobileMenu({ email, signOutAction, settingsHref }: MobileMenuPro
                   </Link>
                 )}
                 <LocaleSwitcher />
-                <form action={signOutAction}>
-                  <Button type="submit" variant="outline" className="w-full" onClick={() => setOpen(false)}>
-                    {t('signOut')}
-                  </Button>
-                </form>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={async () => {
+                    setOpen(false)
+                    await signOutAction()
+                  }}
+                >
+                  {t('signOut')}
+                </Button>
               </div>
             </div>
           </>
