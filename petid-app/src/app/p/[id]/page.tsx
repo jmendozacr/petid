@@ -54,6 +54,14 @@ export default async function PublicPetPage({ params }: PageProps) {
     notFound()
   }
 
+  const { data: ownerProfile } = await supabase
+    .from('profiles')
+    .select('phone')
+    .eq('id', pet.user_id)
+    .single()
+
+  const displayPhone = ownerProfile?.phone ?? pet.owner_phone
+
   const allergies = records?.filter(r => r.type === 'allergy') || []
   const medicalNotes = records?.filter(r => r.type === 'medical_note') || []
 
@@ -100,14 +108,14 @@ export default async function PublicPetPage({ params }: PageProps) {
         </div>
 
         {/* Owner contact */}
-        {pet.owner_phone && (
+        {displayPhone && (
           <SectionCard>
             <SectionLabel>{t('ownerContact')}</SectionLabel>
             <a
-              href={`tel:${pet.owner_phone}`}
+              href={`tel:${displayPhone}`}
               className="text-xl font-medium text-foreground hover:text-primary transition-colors"
             >
-              {pet.owner_phone}
+              {displayPhone}
             </a>
           </SectionCard>
         )}

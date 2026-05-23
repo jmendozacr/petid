@@ -24,6 +24,9 @@ export default function SignupPage() {
   const t = useTranslations('signup')
   const { loading, error, signUp, signInWithGoogle, clearError } = useAuth()
 
+  const [fullName, setFullName] = useState('')
+  const [fullNameError, setFullNameError] = useState<string | null>(null)
+  const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [success, setSuccess] = useState(false)
@@ -34,7 +37,12 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const result = await signUp(email, password)
+    if (fullName.trim().length < 2) {
+      setFullNameError(t('fullNameError'))
+      return
+    }
+    setFullNameError(null)
+    const result = await signUp({ email, password, fullName, phone: phone || undefined })
     if (result.success) {
       setSuccess(true)
     }
@@ -71,6 +79,26 @@ export default function SignupPage() {
                   </div>
                 )}
                 <div className="space-y-1.5">
+                  <Label htmlFor="fullName">{t('fullName')}</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder={t('fullNamePlaceholder')}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    aria-required="true"
+                    aria-invalid={!!fullNameError}
+                    aria-describedby={fullNameError ? 'fullname-error' : undefined}
+                    autoComplete="name"
+                  />
+                  {fullNameError && (
+                    <p id="fullname-error" role="alert" className="text-xs text-danger">
+                      {fullNameError}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1.5">
                   <Label htmlFor="email">{t('email')}</Label>
                   <Input
                     id="email"
@@ -100,6 +128,16 @@ export default function SignupPage() {
                     autoComplete="new-password"
                   />
                   <p className="text-xs text-muted-foreground">{t('passwordHint')}</p>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone">{t('phone')}</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    autoComplete="tel"
+                  />
                 </div>
                 <Button type="submit" className="w-full mt-2" disabled={loading}>
                   {loading ? t('submitting') : t('submit')}

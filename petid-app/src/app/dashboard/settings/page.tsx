@@ -1,11 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useNotificationSettings } from '@/hooks/useNotificationSettings'
 import { getCurrentPosition } from '@/lib/geolocation'
+import { createClient } from '@/lib/supabase/client'
+import { getProfile, updateProfile } from '@/services/profile-service'
 
 export default function SettingsPage() {
   const t = useTranslations('settings')
@@ -13,6 +18,48 @@ export default function SettingsPage() {
     useNotificationSettings()
   const [geoLoading, setGeoLoading] = useState(false)
   const [geoError, setGeoError] = useState<string | null>(null)
+
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [profileSaving, setProfileSaving] = useState(false)
+  const [profileError, setProfileError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return
+      const profile = await getProfile(user.id)
+      if (profile) {
+        setFullName(profile.full_name ?? '')
+        setPhone(profile.phone ?? '')
+      }
+    })
+  }, [])
+
+  async function handleSaveProfile() {
+    if (fullName.trim().length < 2) {
+      setProfileError(t('profileNameError'))
+      return
+    }
+    setProfileError(null)
+    setProfileSaving(true)
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setProfileSaving(false)
+      return
+    }
+    const { error } = await updateProfile(user.id, {
+      full_name: fullName.trim(),
+      phone: phone.trim() || null,
+    })
+    setProfileSaving(false)
+    if (error) {
+      setProfileError(error)
+    } else {
+      toast.success(t('profileSaved'))
+    }
+  }
 
   async function handleUseCurrentLocation() {
     setGeoError(null)
@@ -31,6 +78,44 @@ export default function SettingsPage() {
   return (
     <div className="max-w-xl space-y-6">
       <h1 className="font-heading text-3xl font-bold text-foreground">{t('title')}</h1>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">{t('ownerInfoTitle')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="settings-fullname">{t('ownerFullName')}</Label>
+            <Input
+              id="settings-fullname"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              autoComplete="name"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="settings-phone">{t('ownerPhone')}</Label>
+            <Input
+              id="settings-phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              autoComplete="tel"
+            />
+          </div>
+          {profileError && (
+            <p className="text-sm text-danger">{profileError}</p>
+          )}
+          <Button
+            variant="outline"
+            disabled={profileSaving}
+            onClick={handleSaveProfile}
+          >
+            {profileSaving ? t('savingProfile') : t('saveProfile')}
+          </Button>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

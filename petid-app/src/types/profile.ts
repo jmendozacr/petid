@@ -7,4 +7,6 @@ export interface NotificationSettings {
 
 export interface Profile extends NotificationSettings {
   id: string
+  full_name: string | null
+  phone: string | null
 }

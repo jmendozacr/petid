@@ -29,6 +29,14 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.id)
+    .single()
+
+  const displayName = profile?.full_name ?? user.email!.split('@')[0]
+
   async function handleSignOut() {
     'use server'
     const supabase = await createClient()
@@ -49,7 +57,7 @@ export default async function DashboardLayout({
           </Link>
 
           <nav aria-label="Main navigation">
-            <MobileMenu email={user.email!} signOutAction={handleSignOut} settingsHref="/dashboard/settings" />
+            <MobileMenu email={user.email!} displayName={displayName} signOutAction={handleSignOut} settingsHref="/dashboard/settings" />
           </nav>
         </div>
       </header>

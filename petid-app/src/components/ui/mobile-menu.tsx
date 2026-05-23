@@ -10,6 +10,7 @@ import type { Locale } from '@/i18n/config'
 
 interface MobileMenuProps {
   email: string
+  displayName: string
   signOutAction: () => Promise<void>
   settingsHref?: string
 }
@@ -81,11 +82,11 @@ function ChevronIcon({ open }: { open: boolean }) {
   )
 }
 
-export function MobileMenu({ email, signOutAction, settingsHref }: MobileMenuProps) {
+export function MobileMenu({ email, displayName, signOutAction, settingsHref }: MobileMenuProps) {
   const t = useTranslations('nav')
   const [open, setOpen] = useState(false)
 
-  const initial = email.charAt(0).toUpperCase()
+  const initial = displayName.charAt(0).toUpperCase()
 
   return (
     <div className="flex items-center gap-2">
@@ -110,9 +111,9 @@ export function MobileMenu({ email, signOutAction, settingsHref }: MobileMenuPro
           <span className="h-7 w-7 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center flex-shrink-0 shadow-warm">
             {initial}
           </span>
-          {/* Email */}
+          {/* Display name */}
           <span className="text-sm text-foreground font-medium truncate max-w-[140px]">
-            {email.split('@')[0]}
+            {displayName}
           </span>
           <ChevronIcon open={open} />
         </button>

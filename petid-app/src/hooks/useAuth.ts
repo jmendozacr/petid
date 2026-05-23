@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { updateProfile } from '@/services/profile-service'
 import type { User } from '@supabase/supabase-js'
 
 function validateAuthFields(email: string, password: string): string | null {
@@ -44,7 +45,17 @@ export function useAuth() {
     }
   }, [supabase])
 
-  const signUp = useCallback(async (email: string, password: string): Promise<{ success: boolean }> => {
+  const signUp = useCallback(async ({
+    email,
+    password,
+    fullName,
+    phone,
+  }: {
+    email: string
+    password: string
+    fullName: string
+    phone?: string
+  }): Promise<{ success: boolean }> => {
     const validationError = validateAuthFields(email, password)
     if (validationError) {
       setError(validationError)
@@ -55,7 +66,7 @@ export function useAuth() {
     setError(null)
 
     try {
-      const { error: authError } = await supabase.auth.signUp({
+      const { data, error: authError } = await supabase.auth.signUp({
         email,
         password,
       })
@@ -63,6 +74,13 @@ export function useAuth() {
       if (authError) {
         setError(authError.message)
         return { success: false }
+      }
+
+      if (data?.user) {
+        await updateProfile(data.user.id, {
+          full_name: fullName,
+          phone: phone || null,
+        })
       }
 
       return { success: true }
