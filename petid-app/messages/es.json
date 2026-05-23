@@ -23,7 +23,9 @@
     "submit": "Iniciar sesión",
     "submitting": "Iniciando sesión...",
     "noAccount": "¿No tenés cuenta?",
-    "createOne": "Crear una"
+    "createOne": "Crear una",
+    "continueWithGoogle": "Continuar con Google",
+    "orContinueWith": "o continuar con"
   },
   "signup": {
     "title": "Crear cuenta",
@@ -36,7 +38,9 @@
     "successMessage": "¡Revisá tu correo para confirmar tu cuenta!",
     "goToLogin": "Ir al inicio de sesión",
     "haveAccount": "¿Ya tenés cuenta?",
-    "signIn": "Iniciá sesión"
+    "signIn": "Iniciá sesión",
+    "continueWithGoogle": "Continuar con Google",
+    "orContinueWith": "o continuar con"
   },
   "dashboard": {
     "title": "Mis mascotas",

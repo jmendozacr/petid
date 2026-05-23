@@ -74,6 +74,33 @@ export function useAuth() {
     }
   }, [supabase])
 
+  const signInWithGoogle = useCallback(async (): Promise<{ error: { message: string } | null }> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (authError) {
+        setError(authError.message)
+        return { error: authError }
+      }
+
+      return { error: data?.error ?? null }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Google sign in failed'
+      setError(message)
+      return { error: { message } }
+    } finally {
+      setLoading(false)
+    }
+  }, [supabase])
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut()
   }, [supabase])
@@ -87,6 +114,7 @@ export function useAuth() {
     error,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     clearError,
   }

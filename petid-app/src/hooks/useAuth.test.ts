@@ -2,10 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useAuth } from './useAuth'
 
-const { mockSignIn, mockSignUp, mockSignOut } = vi.hoisted(() => ({
+const { mockSignIn, mockSignUp, mockSignOut, mockSignInWithOAuth } = vi.hoisted(() => ({
   mockSignIn: vi.fn(),
   mockSignUp: vi.fn(),
   mockSignOut: vi.fn(),
+  mockSignInWithOAuth: vi.fn(),
 }))
 
 vi.mock('@/lib/supabase/client', () => ({
@@ -14,6 +15,7 @@ vi.mock('@/lib/supabase/client', () => ({
       signInWithPassword: mockSignIn,
       signUp: mockSignUp,
       signOut: mockSignOut,
+      signInWithOAuth: mockSignInWithOAuth,
     },
   }),
 }))
@@ -107,6 +109,60 @@ describe('useAuth - signUp', () => {
 
     expect(returned.success).toBe(true)
     expect(result.current.error).toBeNull()
+  })
+})
+
+describe('useAuth - signInWithGoogle', () => {
+  it('loading transitions false → true → false', async () => {
+    let resolveOAuth!: (val: unknown) => void
+    mockSignInWithOAuth.mockReturnValueOnce(new Promise((res) => { resolveOAuth = res }))
+
+    const { result } = renderHook(() => useAuth())
+
+    expect(result.current.loading).toBe(false)
+
+    let callPromise: Promise<{ error: null | { message: string } }>
+    act(() => {
+      callPromise = result.current.signInWithGoogle()
+    })
+
+    expect(result.current.loading).toBe(true)
+
+    await act(async () => {
+      resolveOAuth({ data: {}, error: null })
+      await callPromise
+    })
+
+    expect(result.current.loading).toBe(false)
+  })
+
+  it('calls signInWithOAuth with google provider and correct redirectTo', async () => {
+    mockSignInWithOAuth.mockResolvedValueOnce({ data: {}, error: null })
+
+    const { result } = renderHook(() => useAuth())
+
+    await act(async () => {
+      await result.current.signInWithGoogle()
+    })
+
+    expect(mockSignInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+  })
+
+  it('sets error state on failure', async () => {
+    mockSignInWithOAuth.mockResolvedValueOnce({ data: null, error: { message: 'OAuth failed' } })
+
+    const { result } = renderHook(() => useAuth())
+
+    await act(async () => {
+      await result.current.signInWithGoogle()
+    })
+
+    expect(result.current.error).toBe('OAuth failed')
   })
 })
 

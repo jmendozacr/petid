@@ -23,7 +23,9 @@
     "submit": "Sign In",
     "submitting": "Signing in...",
     "noAccount": "Don't have an account?",
-    "createOne": "Create one"
+    "createOne": "Create one",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "or continue with"
   },
   "signup": {
     "title": "Create account",
@@ -36,7 +38,9 @@
     "successMessage": "Check your email for the confirmation link!",
     "goToLogin": "Go to Sign In",
     "haveAccount": "Already have an account?",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "or continue with"
   },
   "dashboard": {
     "title": "My Pets",
