@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { updateProfile } from '@/services/profile-service'
 import type { User } from '@supabase/supabase-js'
 
 function validateAuthFields(email: string, password: string): string | null {
