@@ -109,7 +109,7 @@ export function useAuth() {
         return { error: authError }
       }
 
-      return { error: data?.error ?? null }
+      return { error: null }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Google sign in failed'
       setError(message)
