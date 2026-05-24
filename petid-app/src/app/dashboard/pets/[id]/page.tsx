@@ -39,6 +39,7 @@ export default function PetDetailPage() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [deletingRecordId, setDeletingRecordId] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const handleAddRecord = useCallback(async (data: { type: 'vaccine' | 'allergy' | 'medical_note'; description: string; record_date: string }) => {
     await add(data)
@@ -81,6 +82,12 @@ export default function PetDetailPage() {
       setUploadingPhoto(false)
     }
   }, [uploadPhoto, t])
+
+  async function handleCopyLink() {
+    await navigator.clipboard.writeText(getPublicPetUrl(petId))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   async function handleDownloadQR() {
     setDownloading(true)
@@ -231,8 +238,15 @@ export default function PetDetailPage() {
             {getPublicPetUrl(petId)}
           </p>
           <div className="flex gap-2 justify-center mt-4">
-            <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(getPublicPetUrl(petId))}>
-              {t('copyLink')}
+            <Button variant="outline" size="sm" onClick={handleCopyLink} disabled={copied}>
+              {copied ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  {t('copyLinkCopied')}
+                </>
+              ) : t('copyLink')}
             </Button>
             <Button variant="outline" size="sm" disabled={downloading} onClick={handleDownloadQR}>
               {downloading ? t('downloading') : t('downloadQR')}

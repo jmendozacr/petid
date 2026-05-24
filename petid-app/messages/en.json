@@ -81,6 +81,7 @@
     "qrTitle": "QR Code",
     "qrSubtitle": "Scan this to view pet info publicly",
     "copyLink": "Copy Link",
+    "copyLinkCopied": "Copied!",
     "downloadQR": "Download QR",
     "downloading": "Downloading...",
     "healthTitle": "Health Records",

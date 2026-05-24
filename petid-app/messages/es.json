@@ -81,6 +81,7 @@
     "qrTitle": "Código QR",
     "qrSubtitle": "Escaneá para ver la info pública de tu mascota",
     "copyLink": "Copiar enlace",
+    "copyLinkCopied": "¡Copiado!",
     "downloadQR": "Descargar QR",
     "downloading": "Descargando...",
     "healthTitle": "Registros de salud",
