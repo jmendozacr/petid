@@ -23,18 +23,19 @@ Secondary: - Veterinarians - Pet hotels - Pet sitters
 
 ## Core MVP Features
 
-Authentication - Email signup/login - User session
+Authentication - Email signup/login - Google OAuth - User session
 
-Pet Management - Create pet - Edit pet - Delete pet - Upload pet photo
+Pet Management - Create pet - Edit pet - Delete pet - Upload pet photo - Mark pet as lost/found
 
 Health Records - Vaccines - Allergies - Medical notes
 
 QR System - Unique QR code per pet - Public pet profile
 
-Public Pet Page - Pet photo - Breed - Allergies - Emergency contact
+Public Pet Page - Pet photo - Breed - Allergies - Emergency contact - Lost pet banner
 
-Report Found Pet - Finder can send message - Optional photo - Optional
-location
+Report Found Pet - Finder can send message - Contact info - Optional location
+
+Owner Settings - Edit profile (name, phone) - Notification preferences for nearby lost pets
 
 ## Non Goals (MVP)
 

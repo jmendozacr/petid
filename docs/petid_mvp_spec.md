@@ -94,9 +94,10 @@ The MVP should be **extremely simple**.
 
 ## Authentication
 
-- Email login
-- Magic link or password
+- Email/password signup and login
+- Google OAuth (via Supabase)
 - Owner account
+- Branded HTML email templates (signup confirmation, password reset)
 
 ## Pet Management
 
@@ -119,6 +120,7 @@ Pet fields:
 - Microchip ID
 - Owner phone
 - Emergency contact
+- Lost status (`is_lost`, `lost_since`, `lost_lat`, `lost_lng`)
 
 ---
 
@@ -209,6 +211,9 @@ Libraries:
 - shadcn/ui
 - React Hook Form
 - Zod
+- Zustand (state management)
+- next-intl (i18n, locales: `en` / `es`)
+- Sonner (toast notifications)
 
 ---
 
@@ -235,33 +240,31 @@ Next.js API + PostgreSQL
 
 Core tables:
 
-### users
+### profiles
 
-- id
-- email
-- created_at
+- id (references auth.users)
+- full_name
+- phone
+- notify_nearby_lost_pets
+- notification_lat / notification_lng
+- notification_location_updated_at
 
 ### pets
 
-- id
-- user_id
-- name
-- species
-- breed
-- birthdate
-- color
-- weight
-- microchip_id
-- photo_url
+- id, user_id, name, species, breed, birthdate, color, weight
+- microchip_id, photo_url, owner_phone, emergency_contact
+- is_lost, lost_since, lost_lat, lost_lng
 - created_at
 
 ### health_records
 
-- id
-- pet_id
-- type
-- date
-- description
+- id, pet_id
+- type (`'vaccine' | 'allergy' | 'medical_note'`)
+- description, record_date
+
+### found_reports
+
+- id, pet_id, message, contact, photo_url, lat, lng, created_at
 
 ---
 
