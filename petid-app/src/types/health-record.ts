@@ -14,19 +14,3 @@ export type HealthRecord = {
   record_date: string
   created_at: string
 }
-
-export type HealthRecordState = {
-  records: HealthRecord[]
-  isLoading: boolean
-  error: string | null
-}
-
-export type HealthRecordActions = {
-  setRecords: (records: HealthRecord[]) => void
-  addRecord: (record: HealthRecord) => void
-  removeRecord: (id: string) => void
-  setLoading: (loading: boolean) => void
-  setError: (error: string | null) => void
-}
-
-export type HealthRecordStore = HealthRecordState & HealthRecordActions

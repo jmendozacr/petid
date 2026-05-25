@@ -9,6 +9,23 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
+      exclude: [
+        'src/test/**',
+        'src/types/**',
+        'src/lib/**',
+        '**/*.d.ts',
+        '**/*.config.*',
+      ],
+    },
   },
   resolve: {
     alias: {
