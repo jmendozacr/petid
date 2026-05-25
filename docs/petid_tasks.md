@@ -129,7 +129,9 @@ Route: `/dashboard/settings`
 - [x] **Cobertura de tests**: `@vitest/coverage-v8` instalado, thresholds 80% configurados en `vitest.config.ts`
 - [x] **`usePets.ts`**: consolidadas 6 subscripciones separadas con `useShallow`
 - [x] **Fix test roto**: `useAuth.test.ts` actualizado para reflejar el flujo de signup por metadata (se removió `updateProfile`)
-- [ ] **Server Components en `/p/[id]`**: convertir la página pública de la mascota a Server Component para mejorar SEO y eliminar loading flash (el QR se escanea en emergencias — el tiempo de carga importa)
+- [x] **`/p/[id]` — ISR + metadata**: ya era Server Component; agregado `revalidate=60`, `generateMetadata` con OG/Twitter cards, y `React.cache` para deduplicar queries entre metadata y page
+- [x] **Fix build**: `reactCompiler` movido a top-level en `next.config.ts` (Next.js 16 breaking change)
+- [x] **Fix loop infinito**: `loadPets` movido dentro del `useEffect` en `usePets.ts`; tests actualizados
 
 ### 🔵 LOW — polish y accesibilidad
 
