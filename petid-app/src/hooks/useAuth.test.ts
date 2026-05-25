@@ -2,12 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useAuth } from './useAuth'
 
-const { mockSignIn, mockSignUp, mockSignOut, mockSignInWithOAuth, mockUpdateProfile } = vi.hoisted(() => ({
+const { mockSignIn, mockSignUp, mockSignOut, mockSignInWithOAuth } = vi.hoisted(() => ({
   mockSignIn: vi.fn(),
   mockSignUp: vi.fn(),
   mockSignOut: vi.fn(),
   mockSignInWithOAuth: vi.fn(),
-  mockUpdateProfile: vi.fn(),
 }))
 
 vi.mock('@/lib/supabase/client', () => ({
@@ -19,10 +18,6 @@ vi.mock('@/lib/supabase/client', () => ({
       signInWithOAuth: mockSignInWithOAuth,
     },
   }),
-}))
-
-vi.mock('@/services/profile-service', () => ({
-  updateProfile: mockUpdateProfile,
 }))
 
 beforeEach(() => {
@@ -104,7 +99,6 @@ describe('useAuth - signUp', () => {
 
   it('returns success on valid sign up', async () => {
     mockSignUp.mockResolvedValueOnce({ error: null })
-    mockUpdateProfile.mockResolvedValueOnce({ error: null })
 
     const { result } = renderHook(() => useAuth())
 
@@ -117,10 +111,8 @@ describe('useAuth - signUp', () => {
     expect(result.current.error).toBeNull()
   })
 
-  it('calls updateProfile with correct args after successful signUp', async () => {
-    const mockUser = { id: 'user-42' }
-    mockSignUp.mockResolvedValueOnce({ data: { user: mockUser }, error: null })
-    mockUpdateProfile.mockResolvedValueOnce({ error: null })
+  it('passes fullName and phone as metadata options to signUp', async () => {
+    mockSignUp.mockResolvedValueOnce({ error: null })
 
     const { result } = renderHook(() => useAuth())
 
@@ -128,22 +120,11 @@ describe('useAuth - signUp', () => {
       await result.current.signUp({ email: 'user@example.com', password: 'password123', fullName: 'Jane Doe', phone: '+54911' })
     })
 
-    expect(mockUpdateProfile).toHaveBeenCalledWith('user-42', { full_name: 'Jane Doe', phone: '+54911' })
-  })
-
-  it('still returns { success: true } when updateProfile fails', async () => {
-    const mockUser = { id: 'user-99' }
-    mockSignUp.mockResolvedValueOnce({ data: { user: mockUser }, error: null })
-    mockUpdateProfile.mockResolvedValueOnce({ error: 'Some profile error' })
-
-    const { result } = renderHook(() => useAuth())
-
-    let returned = { success: false }
-    await act(async () => {
-      returned = await result.current.signUp({ email: 'user@example.com', password: 'password123', fullName: 'Jane Doe' })
+    expect(mockSignUp).toHaveBeenCalledWith({
+      email: 'user@example.com',
+      password: 'password123',
+      options: { data: { full_name: 'Jane Doe', phone: '+54911' } },
     })
-
-    expect(returned.success).toBe(true)
   })
 })
 
