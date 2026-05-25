@@ -106,3 +106,31 @@ Route: `/dashboard/settings`
 - [x] Connect Supabase
 - [ ] Configure domain petid.app
 - [ ] Google OAuth credentials (Google Cloud Console + Supabase provider)
+
+---
+
+## Harness Audit — Mejoras Pendientes
+
+> Detectadas en revisión contra los standards de Harness (2026-05-24).
+> Ordenadas por prioridad.
+
+### 🔴 CRITICAL — violaciones de skills
+
+- [ ] **React Compiler**: habilitar en `next.config.ts` (`experimental.reactCompiler: true`) — prerequisito para eliminar todos los `useCallback` innecesarios
+- [ ] **Eliminar `useCallback` en páginas** una vez habilitado el compiler: `dashboard/pets/[id]/page.tsx`, `dashboard/pets/new/page.tsx`, `p/[id]/report/page.tsx`
+- [ ] **Eliminar `useCallback` en hooks** una vez habilitado el compiler: `usePets.ts`, `useHealthRecords.ts`
+- [ ] **`HealthRecordType`**: reemplazar union literal por const object pattern (`typescript` skill)
+- [ ] **`species` en `pet.ts`**: cambiar `string | null` a const type con `'dog' | 'cat' | 'other'`
+- [ ] **Full store subscription**: `usePetStore()` en `dashboard/pets/[id]/page.tsx:29` → usar selector específico `usePetStore((s) => s.updatePet)`
+
+### 🟡 MEDIUM — arquitectura y calidad
+
+- [ ] **Resolver ambigüedad de `health-record-store`**: los tipos `HealthRecordState/Actions/Store` existen pero el store no. Decidir: crear el store o borrar los tipos huérfanos y documentar que health records son local state por decisión
+- [ ] **Cobertura de tests**: instalar `@vitest/coverage-v8` y configurar thresholds en `vitest.config.ts` (líneas: 80%, funciones: 80%, branches: 75%)
+- [ ] **`usePets.ts`**: consolidar 6 subscripciones separadas al store con `useShallow`
+- [ ] **Server Components en `/p/[id]`**: convertir la página pública de la mascota a Server Component para mejorar SEO y eliminar loading flash (el QR se escanea en emergencias — el tiempo de carga importa)
+
+### 🔵 LOW — polish y accesibilidad
+
+- [ ] **`aria-hidden` en SVGs decorativos**: el SVG del `EmptyState` en dashboard necesita `aria-hidden="true"`
+- [ ] **Tests E2E con Playwright**: cubrir el flujo crítico QR scan → ver pet → reportar encontrado

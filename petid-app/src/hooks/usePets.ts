@@ -1,16 +1,20 @@
-import { useCallback } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { usePetStore } from '@/stores/pet-store'
 import { getPets } from '@/services/pets-service'
 
 export function usePets() {
-  const pets = usePetStore((state) => state.pets)
-  const isLoading = usePetStore((state) => state.isLoading)
-  const error = usePetStore((state) => state.error)
-  const setPets = usePetStore((state) => state.setPets)
-  const setLoading = usePetStore((state) => state.setLoading)
-  const setError = usePetStore((state) => state.setError)
+  const { pets, isLoading, error, setPets, setLoading, setError } = usePetStore(
+    useShallow((s) => ({
+      pets: s.pets,
+      isLoading: s.isLoading,
+      error: s.error,
+      setPets: s.setPets,
+      setLoading: s.setLoading,
+      setError: s.setError,
+    }))
+  )
 
-  const loadPets = useCallback(async () => {
+  async function loadPets() {
     setLoading(true)
     try {
       const data = await getPets()
@@ -20,11 +24,11 @@ export function usePets() {
     } finally {
       setLoading(false)
     }
-  }, [setPets, setLoading, setError])
+  }
 
-  const clearError = useCallback(() => {
+  function clearError() {
     setError(null)
-  }, [setError])
+  }
 
   return {
     pets,

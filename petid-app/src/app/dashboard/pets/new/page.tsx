@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { usePetForm } from '@/hooks/usePetForm'
@@ -13,13 +12,13 @@ export default function NewPetPage() {
   const router = useRouter()
   const { formData, loading, error, handleChange, submit } = usePetForm()
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const pet = await submit()
     if (pet) {
       router.push('/dashboard')
     }
-  }, [submit, router])
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
