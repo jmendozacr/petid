@@ -9,7 +9,7 @@ interface EmptyStateProps {
 export function EmptyState({ message, icon, action }: EmptyStateProps) {
   return (
     <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-      {icon && <div className="text-muted-foreground mb-4">{icon}</div>}
+      {icon && <div className="text-muted-foreground mb-4" aria-hidden="true">{icon}</div>}
       <p className="text-muted-foreground mb-4">{message}</p>
       {action}
     </CardContent>

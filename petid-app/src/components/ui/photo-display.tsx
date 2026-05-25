@@ -17,6 +17,7 @@ export function PhotoDisplay({ photoUrl, alt, iconClassName = 'h-16 w-16' }: Pho
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        aria-hidden="true"
       >
         <path
           strokeLinecap="round"
