@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { usePets } from '@/hooks/usePets'
@@ -11,11 +10,7 @@ import { Card, CardContent } from '@/components/ui/card'
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard')
-  const { pets, isLoading, error, loadPets } = usePets()
-
-  useEffect(() => {
-    loadPets()
-  }, [loadPets])
+  const { pets, isLoading, error } = usePets()
 
   return (
     <div className="space-y-8">

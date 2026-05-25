@@ -33,28 +33,24 @@ beforeEach(() => {
 })
 
 describe('usePets', () => {
-  it('loadPets sets pets in store on success', async () => {
+  it('loads pets on mount', async () => {
     vi.mocked(getPets).mockResolvedValue([mockPet])
 
     const { result } = renderHook(() => usePets())
 
-    await act(async () => {
-      await result.current.loadPets()
-    })
+    await act(async () => {})
 
     expect(result.current.pets).toEqual([mockPet])
     expect(result.current.isLoading).toBe(false)
     expect(result.current.error).toBeNull()
   })
 
-  it('loadPets sets error on failure', async () => {
+  it('sets error when fetch fails', async () => {
     vi.mocked(getPets).mockRejectedValue(new Error('Network error'))
 
     const { result } = renderHook(() => usePets())
 
-    await act(async () => {
-      await result.current.loadPets()
-    })
+    await act(async () => {})
 
     expect(result.current.error).toBe('Network error')
     expect(result.current.pets).toEqual([])
@@ -65,9 +61,7 @@ describe('usePets', () => {
 
     const { result } = renderHook(() => usePets())
 
-    await act(async () => {
-      await result.current.loadPets()
-    })
+    await act(async () => {})
 
     act(() => {
       result.current.clearError()

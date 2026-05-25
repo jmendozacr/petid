@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { usePetStore } from '@/stores/pet-store'
 import { getPets } from '@/services/pets-service'
@@ -14,17 +15,15 @@ export function usePets() {
     }))
   )
 
-  async function loadPets() {
+  useEffect(() => {
+    let cancelled = false
     setLoading(true)
-    try {
-      const data = await getPets()
-      setPets(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load pets')
-    } finally {
-      setLoading(false)
-    }
-  }
+    getPets()
+      .then((data) => { if (!cancelled) setPets(data) })
+      .catch((err) => { if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load pets') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [])
 
   function clearError() {
     setError(null)
@@ -34,7 +33,6 @@ export function usePets() {
     pets,
     isLoading,
     error,
-    loadPets,
     clearError,
   }
 }
