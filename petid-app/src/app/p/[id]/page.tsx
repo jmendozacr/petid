@@ -1,3 +1,5 @@
+import { cache } from 'react'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -6,10 +8,58 @@ import { PhotoDisplay } from '@/components/ui/photo-display'
 import { QRCode } from '@/components/qr-code'
 import { Button } from '@/components/ui/button'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 interface PageProps {
   params: Promise<{ id: string }>
+}
+
+const getPet = cache(async (petId: string) => {
+  const supabase = await createClient()
+  const [{ data: pet }, { data: records }] = await Promise.all([
+    supabase
+      .from('pets')
+      .select('id, user_id, name, species, breed, birthdate, color, weight, microchip_id, photo_url, owner_phone, emergency_contact, is_lost, lost_since')
+      .eq('id', petId)
+      .single(),
+    supabase
+      .from('health_records')
+      .select('*')
+      .eq('pet_id', petId)
+      .in('type', ['allergy', 'medical_note'])
+      .order('record_date', { ascending: false }),
+  ])
+  return { pet, records }
+})
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id: petId } = await params
+  const { pet } = await getPet(petId)
+
+  if (!pet) return {}
+
+  const name = pet.name
+  const subtitle = [pet.species, pet.breed].filter(Boolean).join(' · ')
+  const title = pet.is_lost ? `🚨 ${name} está perdido/a` : name
+  const description = pet.is_lost
+    ? `${subtitle} — Ayudanos a encontrarlo`
+    : subtitle
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(pet.photo_url && { images: [{ url: pet.photo_url }] }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(pet.photo_url && { images: [pet.photo_url] }),
+    },
+  }
 }
 
 function SectionCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
@@ -30,30 +80,17 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default async function PublicPetPage({ params }: PageProps) {
   const { id: petId } = await params
-  const [t, locale, supabase] = await Promise.all([
+  const [t, locale, { pet, records }] = await Promise.all([
     getTranslations('publicPet'),
     getLocale(),
-    createClient(),
-  ])
-
-  const [{ data: pet }, { data: records }] = await Promise.all([
-    supabase
-      .from('pets')
-      .select('id, user_id, name, species, breed, birthdate, color, weight, microchip_id, photo_url, owner_phone, emergency_contact, is_lost, lost_since')
-      .eq('id', petId)
-      .single(),
-    supabase
-      .from('health_records')
-      .select('*')
-      .eq('pet_id', petId)
-      .in('type', ['allergy', 'medical_note'])
-      .order('record_date', { ascending: false }),
+    getPet(petId),
   ])
 
   if (!pet) {
     notFound()
   }
 
+  const supabase = await createClient()
   const { data: ownerProfile } = await supabase
     .from('profiles')
     .select('phone')
