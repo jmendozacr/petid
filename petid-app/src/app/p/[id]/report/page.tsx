@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useReportForm } from '@/hooks/useReportForm'
@@ -17,10 +16,10 @@ export default function ReportFoundPetPage() {
 
   const { formData, loading, success, error, handleChange, submit } = useReportForm(petId)
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     await submit()
-  }, [submit])
+  }
 
   if (success) {
     return (

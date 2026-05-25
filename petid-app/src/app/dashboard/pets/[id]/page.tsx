@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
@@ -17,6 +17,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Pet } from '@/types/pet'
+import type { HealthRecordType } from '@/types/health-record'
 
 export default function PetDetailPage() {
   const t = useTranslations('petDetail')
@@ -26,12 +27,12 @@ export default function PetDetailPage() {
 
   const { pet, loading: petLoading, error: petError, update, remove, uploadPhoto, reload, applyUpdate } = usePet(petId)
   const { vaccines, allergies, medicalNotes, add, remove: removeRecord, loading: recordsLoading } = useHealthRecords(petId)
-  const { updatePet } = usePetStore()
+  const updatePet = usePetStore((s) => s.updatePet)
 
-  const handleToggled = useCallback((updatedPet: Pet) => {
+  function handleToggled(updatedPet: Pet) {
     applyUpdate(updatedPet)
     updatePet(updatedPet)
-  }, [applyUpdate, updatePet])
+  }
 
   const [showAddRecord, setShowAddRecord] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -41,12 +42,12 @@ export default function PetDetailPage() {
   const [downloading, setDownloading] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const handleAddRecord = useCallback(async (data: { type: 'vaccine' | 'allergy' | 'medical_note'; description: string; record_date: string }) => {
+  async function handleAddRecord(data: { type: HealthRecordType; description: string; record_date: string }) {
     await add(data)
     setShowAddRecord(false)
-  }, [add])
+  }
 
-  const handleDeleteRecord = useCallback(async (id: string) => {
+  async function handleDeleteRecord(id: string) {
     setDeletingRecordId(id)
     try {
       await removeRecord(id)
@@ -55,9 +56,9 @@ export default function PetDetailPage() {
     } finally {
       setDeletingRecordId(null)
     }
-  }, [removeRecord, t])
+  }
 
-  const handleDeletePet = useCallback(async () => {
+  async function handleDeletePet() {
     setDeleting(true)
     try {
       await remove()
@@ -67,9 +68,9 @@ export default function PetDetailPage() {
       setDeleting(false)
       setShowDeleteModal(false)
     }
-  }, [remove, router, t])
+  }
 
-  const handlePhotoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -81,7 +82,7 @@ export default function PetDetailPage() {
     } finally {
       setUploadingPhoto(false)
     }
-  }, [uploadPhoto, t])
+  }
 
   async function handleCopyLink() {
     await navigator.clipboard.writeText(getPublicPetUrl(petId))

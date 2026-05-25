@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { getHealthRecords, createHealthRecord, deleteHealthRecord } from '@/services/health-record-service'
-import type { HealthRecord } from '@/types/health-record'
+import type { HealthRecord, HealthRecordType } from '@/types/health-record'
 
 export type NewRecordData = {
-  type: 'vaccine' | 'allergy' | 'medical_note'
+  type: HealthRecordType
   description: string
   record_date: string
 }
@@ -13,7 +13,7 @@ export function useHealthRecords(petId: string) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const loadRecords = useCallback(async () => {
+  async function loadRecords() {
     setLoading(true)
     setError(null)
     try {
@@ -24,13 +24,13 @@ export function useHealthRecords(petId: string) {
     } finally {
       setLoading(false)
     }
-  }, [petId])
+  }
 
   useEffect(() => {
     loadRecords()
-  }, [loadRecords])
+  }, [petId])
 
-  const add = useCallback(async (data: NewRecordData) => {
+  async function add(data: NewRecordData) {
     const tempId = `temp-${Date.now()}`
     const optimisticRecord: HealthRecord = {
       id: tempId,
@@ -47,9 +47,9 @@ export function useHealthRecords(petId: string) {
       setRecords(prev => prev.filter(r => r.id !== tempId))
       throw err
     }
-  }, [petId])
+  }
 
-  const remove = useCallback(async (id: string) => {
+  async function remove(id: string) {
     const previous = records
     setRecords(prev => prev.filter(r => r.id !== id))
     try {
@@ -58,7 +58,7 @@ export function useHealthRecords(petId: string) {
       setRecords(previous)
       throw err
     }
-  }, [records])
+  }
 
   const vaccines = records.filter(r => r.type === 'vaccine')
   const allergies = records.filter(r => r.type === 'allergy')
