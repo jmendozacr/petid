@@ -116,18 +116,19 @@ Route: `/dashboard/settings`
 
 ### 🔴 CRITICAL — violaciones de skills
 
-- [ ] **React Compiler**: habilitar en `next.config.ts` (`experimental.reactCompiler: true`) — prerequisito para eliminar todos los `useCallback` innecesarios
-- [ ] **Eliminar `useCallback` en páginas** una vez habilitado el compiler: `dashboard/pets/[id]/page.tsx`, `dashboard/pets/new/page.tsx`, `p/[id]/report/page.tsx`
-- [ ] **Eliminar `useCallback` en hooks** una vez habilitado el compiler: `usePets.ts`, `useHealthRecords.ts`
-- [ ] **`HealthRecordType`**: reemplazar union literal por const object pattern (`typescript` skill)
-- [ ] **`species` en `pet.ts`**: cambiar `string | null` a const type con `'dog' | 'cat' | 'other'`
-- [ ] **Full store subscription**: `usePetStore()` en `dashboard/pets/[id]/page.tsx:29` → usar selector específico `usePetStore((s) => s.updatePet)`
+- [x] **React Compiler**: habilitado en `next.config.ts` (`experimental.reactCompiler: true`)
+- [x] **Eliminar `useCallback` en páginas**: `dashboard/pets/[id]/page.tsx`, `dashboard/pets/new/page.tsx`, `p/[id]/report/page.tsx`
+- [x] **Eliminar `useCallback` en hooks**: `usePets.ts`, `useHealthRecords.ts`
+- [x] **`HealthRecordType`**: reemplazado por `HEALTH_RECORD_TYPE` const object; tipo derivado con `(typeof ...)[keyof typeof ...]`
+- [x] **`species` en `pet.ts`**: se mantiene `string | null` — es input libre, no enum (decisión deliberada)
+- [x] **Full store subscription**: `usePetStore()` en `dashboard/pets/[id]/page.tsx` → `usePetStore((s) => s.updatePet)`
 
 ### 🟡 MEDIUM — arquitectura y calidad
 
-- [ ] **Resolver ambigüedad de `health-record-store`**: los tipos `HealthRecordState/Actions/Store` existen pero el store no. Decidir: crear el store o borrar los tipos huérfanos y documentar que health records son local state por decisión
-- [ ] **Cobertura de tests**: instalar `@vitest/coverage-v8` y configurar thresholds en `vitest.config.ts` (líneas: 80%, funciones: 80%, branches: 75%)
-- [ ] **`usePets.ts`**: consolidar 6 subscripciones separadas al store con `useShallow`
+- [x] **Resolver ambigüedad de `health-record-store`**: eliminados tipos huérfanos `HealthRecordState/Actions/Store`; health records son local state por decisión (no requieren store global)
+- [x] **Cobertura de tests**: `@vitest/coverage-v8` instalado, thresholds 80% configurados en `vitest.config.ts`
+- [x] **`usePets.ts`**: consolidadas 6 subscripciones separadas con `useShallow`
+- [x] **Fix test roto**: `useAuth.test.ts` actualizado para reflejar el flujo de signup por metadata (se removió `updateProfile`)
 - [ ] **Server Components en `/p/[id]`**: convertir la página pública de la mascota a Server Component para mejorar SEO y eliminar loading flash (el QR se escanea en emergencias — el tiempo de carga importa)
 
 ### 🔵 LOW — polish y accesibilidad
