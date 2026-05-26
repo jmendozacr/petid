@@ -135,5 +135,5 @@ Route: `/dashboard/settings`
 
 ### 🔵 LOW — polish y accesibilidad
 
-- [ ] **`aria-hidden` en SVGs decorativos**: el SVG del `EmptyState` en dashboard necesita `aria-hidden="true"`
+- [x] **`aria-hidden` en SVGs decorativos**: el SVG del `EmptyState` en dashboard necesita `aria-hidden="true"`
 - [ ] **Tests E2E con Playwright**: cubrir el flujo crítico QR scan → ver pet → reportar encontrado
