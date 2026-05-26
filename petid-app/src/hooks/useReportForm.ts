@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { uploadReportPhoto } from '@/services/pets-service'
 
 export type ReportFormData = {
   message: string
@@ -15,6 +16,7 @@ export const initialReportFormData: ReportFormData = {
 
 export function useReportForm(petId: string) {
   const [formData, setFormData] = useState<ReportFormData>(initialReportFormData)
+  const [photo, setPhoto] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -23,6 +25,10 @@ export function useReportForm(petId: string) {
 
   const handleChange = useCallback((field: keyof ReportFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }, [])
+
+  const handlePhotoChange = useCallback((file: File | null) => {
+    setPhoto(file)
   }, [])
 
   const submit = useCallback(async (): Promise<boolean> => {
@@ -35,7 +41,7 @@ export function useReportForm(petId: string) {
     setError(null)
 
     try {
-      const { error: insertError } = await supabase
+      const { data: report, error: insertError } = await supabase
         .from('found_reports')
         .insert({
           pet_id: petId,
@@ -43,10 +49,20 @@ export function useReportForm(petId: string) {
           location: formData.location,
           contact: formData.contact || null,
         })
+        .select('id')
+        .single()
 
-      if (insertError) {
-        setError(insertError.message)
+      if (insertError || !report) {
+        setError(insertError?.message ?? 'Failed to submit report')
         return false
+      }
+
+      if (photo) {
+        const photoUrl = await uploadReportPhoto(report.id, photo)
+        await supabase
+          .from('found_reports')
+          .update({ photo_url: photoUrl })
+          .eq('id', report.id)
       }
 
       setSuccess(true)
@@ -57,20 +73,23 @@ export function useReportForm(petId: string) {
     } finally {
       setLoading(false)
     }
-  }, [formData, petId, supabase])
+  }, [formData, petId, photo, supabase])
 
   const reset = useCallback(() => {
     setFormData(initialReportFormData)
+    setPhoto(null)
     setSuccess(false)
     setError(null)
   }, [])
 
   return {
     formData,
+    photo,
     loading,
     success,
     error,
     handleChange,
+    handlePhotoChange,
     submit,
     reset,
   }

@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { getPets, getPetById, createPet, updatePet, deletePet, uploadPetPhoto, toggleLostStatus } from './pets-service'
 import type { Pet } from '@/types/pet'
 
+vi.mock('@/lib/image-utils', () => ({
+  compressImage: vi.fn((file: File) => Promise.resolve(file)),
+}))
+
 const { mockTerminal, mockDeleteEq, mockGetUser, mockStorageUpload, mockGetPublicUrl } = vi.hoisted(() => ({
   mockTerminal: vi.fn(),
   mockDeleteEq: vi.fn(),

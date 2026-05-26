@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { usePetForm } from '@/hooks/usePetForm'
@@ -10,7 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 export default function NewPetPage() {
   const t = useTranslations('newPet')
   const router = useRouter()
-  const { formData, loading, error, handleChange, submit } = usePetForm()
+  const { formData, loading, error, handleChange, handlePhotoChange, submit } = usePetForm()
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+
+  function handlePhoto(file: File | null) {
+    handlePhotoChange(file)
+    setPhotoPreview(file ? URL.createObjectURL(file) : null)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -29,7 +36,13 @@ export default function NewPetPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            <PetFormFields formData={formData} onChange={handleChange} error={error} />
+            <PetFormFields
+              formData={formData}
+              onChange={handleChange}
+              error={error}
+              onPhotoChange={handlePhoto}
+              photoPreview={photoPreview}
+            />
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button type="button" variant="outline" onClick={() => router.back()}>

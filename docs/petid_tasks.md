@@ -107,6 +107,25 @@ Route: `/dashboard/settings`
 - [ ] Configure domain petid.app
 - [ ] Google OAuth credentials (Google Cloud Console + Supabase provider)
 
+## Phase 17 — Completar flujos existentes
+
+- [x] **Foto en reporte de mascota encontrada**: `found_reports.photo_url` existe en el schema pero el formulario `/p/[id]/report` no lo usa. Agregar upload de imagen opcional.
+- [ ] **Flujo de recuperación confirmada**: al marcar como encontrada, mostrar pantalla de cierre + notificar al usuario que reportó haberla visto (usando `found_reports.contact`).
+- [ ] **Radio de alerta configurable**: el radio de 5km está hardcodeado en la Edge Function `notify-lost-pet`. Exponer configuración por usuario (1km / 5km / 10km) en settings.
+
+## Phase 18 — Features de alto valor
+
+- [ ] **Recordatorios de vacunas**: agregar campo `next_due_date` a `health_records` para tipo `vaccine`. Enviar email automático N días antes via Supabase cron o Edge Function.
+- [ ] **Notificaciones push (web push / PWA)**: para alertas de mascota perdida, reemplazar o complementar email con push notifications. Mayor urgencia, menor latencia.
+- [ ] **Compartir alerta en redes**: al marcar mascota como perdida, ofrecer botón de compartir en WhatsApp / X con foto + link público. Difusión orgánica sin costo.
+- [ ] **Edad de la mascota visible**: calcular y mostrar la edad a partir de `birthdate` en la pet card y en la página pública.
+
+## Phase 19 — Features de mayor escala
+
+- [ ] **SMS via Twilio**: agregar canal SMS a la Edge Function `notify-lost-pet`. Paralelo a email, mayor tasa de apertura para emergencias.
+- [ ] **Historial de ubicaciones**: guardar coordenadas históricas al actualizar `lost_lat/lost_lng` en lugar de sobrescribir. Permite mostrar área de búsqueda si hay múltiples reportes.
+- [ ] **Tarjeta imprimible con QR**: generar PDF descargable con QR, foto y datos de contacto listos para imprimir y poner en collar o chapita.
+
 ---
 
 ## Harness Audit — Mejoras Pendientes

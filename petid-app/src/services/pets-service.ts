@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { compressImage } from '@/lib/image-utils'
 import type { Pet } from '@/types/pet'
 
 export async function getPets(): Promise<Pet[]> {
@@ -113,29 +114,35 @@ export async function deletePet(id: string): Promise<void> {
 
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024
 
-export async function uploadPetPhoto(petId: string, file: File): Promise<string> {
-  if (!file.type.startsWith('image/')) {
-    throw new Error('File must be an image')
-  }
-  if (file.size > MAX_PHOTO_SIZE) {
-    throw new Error('File must be under 5MB')
-  }
-
+async function uploadImageToStorage(bucket: string, path: string, file: File): Promise<string> {
+  const compressed = await compressImage(file)
   const supabase = createClient()
-  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
-  const filePath = `pets/${petId}/photo.${ext}`
 
   const { error: uploadError } = await supabase.storage
-    .from('pet-photos')
-    .upload(filePath, file, { upsert: true })
+    .from(bucket)
+    .upload(path, compressed, { upsert: true })
 
   if (uploadError) {
     throw new Error(uploadError.message)
   }
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('pet-photos')
-    .getPublicUrl(filePath)
-
+  const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(path)
   return publicUrl
+}
+
+function validateImageFile(file: File): void {
+  if (!file.type.startsWith('image/')) throw new Error('File must be an image')
+  if (file.size > MAX_PHOTO_SIZE) throw new Error('File must be under 5MB')
+}
+
+export async function uploadPetPhoto(petId: string, file: File): Promise<string> {
+  validateImageFile(file)
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+  return uploadImageToStorage('pet-photos', `pets/${petId}/photo.${ext}`, file)
+}
+
+export async function uploadReportPhoto(reportId: string, file: File): Promise<string> {
+  validateImageFile(file)
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+  return uploadImageToStorage('pet-photos', `reports/${reportId}/photo.${ext}`, file)
 }

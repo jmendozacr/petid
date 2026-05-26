@@ -128,6 +128,9 @@
     "locationPlaceholder": "Street, neighborhood, city...",
     "contact": "Your Contact (optional)",
     "contactPlaceholder": "Phone or email...",
+    "photo": "Photo (optional)",
+    "photoHint": "Tap to add a photo",
+    "photoChange": "Change photo",
     "submit": "Submit Report",
     "submitting": "Sending...",
     "successTitle": "Report Submitted!",
@@ -149,7 +152,8 @@
     "weight": "Weight (kg)",
     "microchip": "Microchip ID",
     "ownerPhone": "Owner Phone",
-    "emergencyContact": "Emergency Contact"
+    "emergencyContact": "Emergency Contact",
+    "photoOptional": "Photo (optional)"
   },
   "healthRecord": {
     "addTitle": "Add Health Record",

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { createPet } from '@/services/pets-service'
+import { createPet, uploadPetPhoto, updatePet } from '@/services/pets-service'
 import type { Pet } from '@/types/pet'
 
 export type PetFormData = {
@@ -28,11 +28,16 @@ export const initialFormData: PetFormData = {
 
 export function usePetForm() {
   const [formData, setFormData] = useState<PetFormData>(initialFormData)
+  const [pendingPhoto, setPendingPhoto] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleChange = useCallback((field: keyof PetFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }, [])
+
+  const handlePhotoChange = useCallback((file: File | null) => {
+    setPendingPhoto(file)
   }, [])
 
   const submit = useCallback(async (): Promise<Pet | null> => {
@@ -57,7 +62,13 @@ export function usePetForm() {
         emergency_contact: formData.emergency_contact || null,
       }
 
-      const pet = await createPet(petData)
+      let pet = await createPet(petData)
+
+      if (pendingPhoto) {
+        const photoUrl = await uploadPetPhoto(pet.id, pendingPhoto)
+        pet = await updatePet(pet.id, { photo_url: photoUrl })
+      }
+
       return pet
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create pet')
@@ -65,18 +76,21 @@ export function usePetForm() {
     } finally {
       setLoading(false)
     }
-  }, [formData])
+  }, [formData, pendingPhoto])
 
   const reset = useCallback(() => {
     setFormData(initialFormData)
+    setPendingPhoto(null)
     setError(null)
   }, [])
 
   return {
     formData,
+    pendingPhoto,
     loading,
     error,
     handleChange,
+    handlePhotoChange,
     submit,
     reset,
     setError,
