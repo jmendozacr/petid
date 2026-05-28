@@ -7,14 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
 import { useNotificationSettings } from '@/hooks/useNotificationSettings'
+import { ALERT_RADIUS_OPTIONS } from '@/types/profile'
+import type { AlertRadius } from '@/types/profile'
 import { getCurrentPosition } from '@/lib/geolocation'
 import { createClient } from '@/lib/supabase/client'
 import { getProfile, updateProfile } from '@/services/profile-service'
 
 export default function SettingsPage() {
   const t = useTranslations('settings')
-  const { settings, isLoading, isSaving, toggleOptIn, saveAlertLocation } =
+  const { settings, isLoading, isSaving, toggleOptIn, saveAlertLocation, saveAlertRadius } =
     useNotificationSettings()
   const [geoLoading, setGeoLoading] = useState(false)
   const [geoError, setGeoError] = useState<string | null>(null)
@@ -143,6 +146,31 @@ export default function SettingsPage() {
                 }`}
               />
             </button>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">{t('alertRadiusTitle')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            {t('alertRadiusDescription')}
+          </p>
+          {isLoading ? (
+            <div className="h-10 w-full rounded-md bg-muted animate-pulse" />
+          ) : (
+            <Select
+              value={String(settings?.alert_radius_km ?? 5)}
+              onChange={(e) => saveAlertRadius(Number(e.target.value) as AlertRadius)}
+              disabled={isSaving}
+              aria-label={t('alertRadiusTitle')}
+            >
+              {ALERT_RADIUS_OPTIONS.map((km) => (
+                <option key={km} value={km}>{t(`alertRadius${km}km`)}</option>
+              ))}
+            </Select>
           )}
         </CardContent>
       </Card>

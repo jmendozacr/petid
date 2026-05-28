@@ -6,7 +6,7 @@ import {
   getNotificationSettings,
   updateNotificationSettings,
 } from '@/services/notification-settings-service'
-import type { NotificationSettings } from '@/types/profile'
+import type { AlertRadius, NotificationSettings } from '@/types/profile'
 
 interface UseNotificationSettingsReturn {
   settings: NotificationSettings | null
@@ -15,6 +15,7 @@ interface UseNotificationSettingsReturn {
   error: string | null
   toggleOptIn: () => Promise<void>
   saveAlertLocation: (lat: number, lng: number) => Promise<void>
+  saveAlertRadius: (km: AlertRadius) => Promise<void>
 }
 
 export function useNotificationSettings(): UseNotificationSettingsReturn {
@@ -104,5 +105,32 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
     setIsSaving(false)
   }
 
-  return { settings, isLoading, isSaving, error, toggleOptIn, saveAlertLocation }
+  async function saveAlertRadius(km: AlertRadius) {
+    if (!settings) return
+
+    const previous = settings.alert_radius_km
+    setSettings(s => s ? { ...s, alert_radius_km: km } : s)
+    setIsSaving(true)
+    setError(null)
+
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      setSettings(s => s ? { ...s, alert_radius_km: previous } : s)
+      setIsSaving(false)
+      return
+    }
+
+    const result = await updateNotificationSettings(user.id, { alert_radius_km: km })
+
+    if (!result.success) {
+      setSettings(s => s ? { ...s, alert_radius_km: previous } : s)
+      setError(result.error ?? 'Failed to save')
+    }
+
+    setIsSaving(false)
+  }
+
+  return { settings, isLoading, isSaving, error, toggleOptIn, saveAlertLocation, saveAlertRadius }
 }

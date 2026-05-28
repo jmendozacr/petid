@@ -111,7 +111,7 @@ Route: `/dashboard/settings`
 
 - [x] **Foto en reporte de mascota encontrada**: `found_reports.photo_url` existe en el schema pero el formulario `/p/[id]/report` no lo usa. Agregar upload de imagen opcional.
 - [x] **Flujo de recuperación confirmada**: al marcar como encontrada, mostrar pantalla de cierre + notificar al usuario que reportó haberla visto (usando `found_reports.contact`).
-- [ ] **Radio de alerta configurable**: el radio de 5km está hardcodeado en la Edge Function `notify-lost-pet`. Exponer configuración por usuario (1km / 5km / 10km) en settings.
+- [x] **Radio de alerta configurable**: el radio de 5km está hardcodeado en la Edge Function `notify-lost-pet`. Exponer configuración por usuario (1km / 5km / 10km) en settings.
 
 ## Phase 18 — Features de alto valor
 

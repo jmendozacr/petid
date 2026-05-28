@@ -195,7 +195,12 @@
     "useCurrentLocation": "Use my current location",
     "savingLocation": "Saving location...",
     "locationDenied": "Location access was denied. Please enable it in your browser settings.",
-    "lastUpdated": "Last updated: {date}"
+    "lastUpdated": "Last updated: {date}",
+    "alertRadiusTitle": "Alert Radius",
+    "alertRadiusDescription": "Distance from your alert location to receive lost pet notifications.",
+    "alertRadius1km": "1 km",
+    "alertRadius5km": "5 km",
+    "alertRadius10km": "10 km"
   },
   "language": {
     "en": "EN",

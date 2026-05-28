@@ -6,7 +6,7 @@ export async function getNotificationSettings(userId: string): Promise<Notificat
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('notify_nearby_lost_pets, notification_lat, notification_lng, notification_location_updated_at')
+    .select('notify_nearby_lost_pets, notification_lat, notification_lng, notification_location_updated_at, alert_radius_km')
     .eq('id', userId)
     .single()
 

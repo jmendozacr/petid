@@ -26,6 +26,7 @@ const mockProfile: Profile = {
   notification_lat: null,
   notification_lng: null,
   notification_location_updated_at: null,
+  alert_radius_km: 5,
 }
 
 beforeEach(() => {

@@ -195,7 +195,12 @@
     "useCurrentLocation": "Usar mi ubicación actual",
     "savingLocation": "Guardando ubicación...",
     "locationDenied": "Se denegó el acceso a la ubicación. Habilitala en la configuración de tu navegador.",
-    "lastUpdated": "Última actualización: {date}"
+    "lastUpdated": "Última actualización: {date}",
+    "alertRadiusTitle": "Radio de alerta",
+    "alertRadiusDescription": "Distancia desde tu ubicación de alertas para recibir notificaciones de mascotas perdidas.",
+    "alertRadius1km": "1 km",
+    "alertRadius5km": "5 km",
+    "alertRadius10km": "10 km"
   },
   "language": {
     "en": "EN",
