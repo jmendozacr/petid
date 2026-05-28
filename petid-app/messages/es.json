@@ -105,7 +105,12 @@
     "toastRecordError": "Error al eliminar el registro",
     "notFound": "Mascota no encontrada",
     "backToDashboard": "Volver al panel",
-    "deleteTitle": "Eliminar mascota"
+    "deleteTitle": "Eliminar mascota",
+    "recoverySuccessTitle": "¡Tu mascota está en casa!",
+    "recoverySuccessMessage": "El banner de perdida fue removido de la página pública.",
+    "recoveryReporterLabel": "Contacto del último reporte:",
+    "recoveryNoReporter": "No se recibieron reportes.",
+    "recoveryDismiss": "Listo"
   },
   "publicPet": {
     "lostTitle": "MASCOTA PERDIDA",

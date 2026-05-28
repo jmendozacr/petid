@@ -18,6 +18,18 @@ export type Pet = {
   created_at: string
 }
 
+export interface FoundReport {
+  contact: string
+  message: string | null
+}
+
+export type ToggleLostPetResult = {
+  success: boolean
+  pet?: Pet
+  foundReport?: FoundReport
+  error?: string
+}
+
 export type LostStatusUpdate = {
   is_lost: boolean
   lost_since: string | null

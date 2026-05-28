@@ -1,19 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@/test/test-utils'
 import { LostPetToggleButton } from './lost-pet-toggle-button'
-import type { Pet } from '@/types/pet'
+import type { Pet, FoundReport } from '@/types/pet'
 
-const { mockToggle, mockIsLoading, mockToast } = vi.hoisted(() => ({
+const { mockToggle, mockIsLoading, mockIsGeoLoading, mockFoundReport, mockToast } = vi.hoisted(() => ({
   mockToggle: vi.fn(),
   mockIsLoading: { value: false },
+  mockIsGeoLoading: { value: false },
+  mockFoundReport: { value: null as FoundReport | null },
   mockToast: { success: vi.fn(), error: vi.fn() },
 }))
 
 vi.mock('@/hooks/useLostPetToggle', () => ({
   useLostPetToggle: () => ({
     isLoading: mockIsLoading.value,
+    isGeoLoading: mockIsGeoLoading.value,
     toggle: mockToggle,
     error: null,
+    foundReport: mockFoundReport.value,
     clearError: vi.fn(),
   }),
 }))
@@ -48,6 +52,8 @@ const mockPet: Pet = {
 beforeEach(() => {
   vi.clearAllMocks()
   mockIsLoading.value = false
+  mockIsGeoLoading.value = false
+  mockFoundReport.value = null
 })
 
 describe('LostPetToggleButton', () => {
@@ -145,7 +151,7 @@ describe('LostPetToggleButton', () => {
     })
   })
 
-  it('shows success toast on successful toggle', async () => {
+  it('shows success toast when marking as lost', async () => {
     mockToggle.mockResolvedValueOnce(mockPet)
 
     render(
@@ -172,6 +178,94 @@ describe('LostPetToggleButton', () => {
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled()
+    })
+  })
+
+  // REQ-01.1: recovery screen appears after successful mark-as-found
+  it('shows recovery screen after successful mark-as-found (REQ-01.1)', async () => {
+    mockToggle.mockResolvedValueOnce(mockPet)
+
+    render(
+      <LostPetToggleButton petId="pet-1" isLost={true} lostSince={null} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Found' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as found/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /your pet is home/i })).toBeInTheDocument()
+    })
+  })
+
+  // REQ-01.2: recovery screen does NOT appear after mark-as-lost
+  it('does not show recovery screen after mark-as-lost (REQ-01.2)', async () => {
+    mockToggle.mockResolvedValueOnce(mockPet)
+
+    render(
+      <LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Lost' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as lost/i }))
+
+    await waitFor(() => {
+      expect(mockToast.success).toHaveBeenCalled()
+    })
+
+    expect(screen.queryByRole('heading', { name: /your pet is home/i })).toBeNull()
+  })
+
+  // REQ-02.1: dismiss button closes recovery screen
+  it('dismiss button closes recovery screen (REQ-02.1)', async () => {
+    mockToggle.mockResolvedValueOnce(mockPet)
+
+    render(
+      <LostPetToggleButton petId="pet-1" isLost={true} lostSince={null} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Found' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as found/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /your pet is home/i })).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /done/i }))
+
+    expect(screen.queryByRole('heading', { name: /your pet is home/i })).toBeNull()
+  })
+
+  // REQ-03.1: reporter contact visible when foundReport is present
+  it('shows reporter contact when foundReport is present (REQ-03.1)', async () => {
+    mockFoundReport.value = { contact: 'finder@example.com', message: 'Found near the park' }
+    mockToggle.mockResolvedValueOnce(mockPet)
+
+    render(
+      <LostPetToggleButton petId="pet-1" isLost={true} lostSince={null} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Found' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as found/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('finder@example.com')).toBeInTheDocument()
+    })
+  })
+
+  // REQ-03.2: no contact section when no foundReport
+  it('shows no-reporter fallback when foundReport is null (REQ-03.2)', async () => {
+    mockFoundReport.value = null
+    mockToggle.mockResolvedValueOnce(mockPet)
+
+    render(
+      <LostPetToggleButton petId="pet-1" isLost={true} lostSince={null} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Found' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as found/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText(/no reports were submitted/i)).toBeInTheDocument()
     })
   })
 })

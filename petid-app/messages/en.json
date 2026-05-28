@@ -105,7 +105,12 @@
     "toastRecordError": "Failed to delete record",
     "notFound": "Pet not found",
     "backToDashboard": "Back to Dashboard",
-    "deleteTitle": "Delete Pet"
+    "deleteTitle": "Delete Pet",
+    "recoverySuccessTitle": "Your pet is home!",
+    "recoverySuccessMessage": "The lost banner has been removed from the public page.",
+    "recoveryReporterLabel": "Contact from last report:",
+    "recoveryNoReporter": "No reports were submitted.",
+    "recoveryDismiss": "Done"
   },
   "publicPet": {
     "lostTitle": "LOST PET",

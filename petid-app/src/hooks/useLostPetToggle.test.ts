@@ -109,4 +109,100 @@ describe('useLostPetToggle', () => {
 
     expect(result.current.error).toBeNull()
   })
+
+  // REQ-10.1: foundReport exposed after successful toggle(false) with report
+  it('exposes foundReport after successful mark-as-found with a report (REQ-10.1)', async () => {
+    mockToggleLostPetStatus.mockResolvedValueOnce({
+      success: true,
+      pet: mockPet,
+      foundReport: { contact: 'finder@example.com', message: 'Near the park' },
+    })
+
+    const { result } = renderHook(() => useLostPetToggle('pet-1'))
+
+    expect(result.current.foundReport).toBeNull()
+
+    await act(async () => {
+      await result.current.toggle(false)
+    })
+
+    expect(result.current.foundReport).toEqual({
+      contact: 'finder@example.com',
+      message: 'Near the park',
+    })
+  })
+
+  // REQ-10.1 variant: foundReport is null when action returns no report
+  it('foundReport remains null when mark-as-found has no report', async () => {
+    mockToggleLostPetStatus.mockResolvedValueOnce({
+      success: true,
+      pet: mockPet,
+      foundReport: undefined,
+    })
+
+    const { result } = renderHook(() => useLostPetToggle('pet-1'))
+
+    await act(async () => {
+      await result.current.toggle(false)
+    })
+
+    expect(result.current.foundReport).toBeNull()
+  })
+
+  // REQ-10.2: failed toggle → foundReport not exposed
+  it('does not expose stale foundReport after failed toggle (REQ-10.2)', async () => {
+    // First call succeeds with a report
+    mockToggleLostPetStatus.mockResolvedValueOnce({
+      success: true,
+      pet: mockPet,
+      foundReport: { contact: 'finder@example.com', message: null },
+    })
+
+    const { result } = renderHook(() => useLostPetToggle('pet-1'))
+
+    await act(async () => {
+      await result.current.toggle(false)
+    })
+
+    expect(result.current.foundReport).not.toBeNull()
+
+    // Second call fails → foundReport must be cleared
+    mockToggleLostPetStatus.mockResolvedValueOnce({ success: false, error: 'Unauthorized' })
+
+    await act(async () => {
+      await result.current.toggle(false)
+    })
+
+    expect(result.current.foundReport).toBeNull()
+  })
+
+  // foundReport cleared at the start of each toggle call
+  it('clears foundReport at the start of a new toggle call', async () => {
+    mockToggleLostPetStatus.mockResolvedValueOnce({
+      success: true,
+      pet: mockPet,
+      foundReport: { contact: 'finder@example.com', message: null },
+    })
+
+    const { result } = renderHook(() => useLostPetToggle('pet-1'))
+
+    await act(async () => {
+      await result.current.toggle(false)
+    })
+
+    expect(result.current.foundReport).not.toBeNull()
+
+    // Start a new toggle that resolves with no report
+    mockToggleLostPetStatus.mockResolvedValueOnce({
+      success: true,
+      pet: mockPet,
+      foundReport: undefined,
+    })
+
+    await act(async () => {
+      await result.current.toggle(false)
+    })
+
+    expect(result.current.foundReport).toBeNull()
+  })
 })
