@@ -171,7 +171,9 @@
     "descriptionPlaceholder": "Enter details...",
     "save": "Save Record",
     "descriptionRequired": "Description is required",
-    "delete": "Delete"
+    "delete": "Delete",
+    "nextDueDate": "Next due date",
+    "nextDueDateLabel": "Next due:"
   },
   "deleteConfirm": {
     "description": "Are you sure you want to delete {name}? This action cannot be undone.",

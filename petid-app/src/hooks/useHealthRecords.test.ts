@@ -12,6 +12,8 @@ const mockVaccine: HealthRecord = {
   type: 'vaccine',
   description: 'Rabies',
   record_date: '2024-01-15',
+  next_due_date: null,
+  reminder_sent_at: null,
   created_at: '2024-01-15T00:00:00Z',
 }
 
@@ -21,6 +23,8 @@ const mockAllergy: HealthRecord = {
   type: 'allergy',
   description: 'Chicken allergy',
   record_date: '2024-02-01',
+  next_due_date: null,
+  reminder_sent_at: null,
   created_at: '2024-02-01T00:00:00Z',
 }
 
@@ -30,6 +34,8 @@ const mockNote: HealthRecord = {
   type: 'medical_note',
   description: 'Annual checkup',
   record_date: '2024-03-01',
+  next_due_date: null,
+  reminder_sent_at: null,
   created_at: '2024-03-01T00:00:00Z',
 }
 

@@ -12,5 +12,7 @@ export type HealthRecord = {
   type: HealthRecordType
   description: string
   record_date: string
+  next_due_date?: string | null
+  reminder_sent_at?: string | null
   created_at: string
 }

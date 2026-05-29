@@ -21,6 +21,7 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
     type: 'vaccine',
     description: '',
     record_date: new Date().toISOString().split('T')[0],
+    next_due_date: null,
   })
   const [error, setError] = useState<string | null>(null)
 
@@ -36,6 +37,7 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
       type: 'vaccine',
       description: '',
       record_date: new Date().toISOString().split('T')[0],
+      next_due_date: null,
     })
   }
 
@@ -56,7 +58,10 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
             <Select
               id="record-type"
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as NewRecordData['type'] })}
+              onChange={(e) => {
+                const newType = e.target.value as NewRecordData['type']
+                setFormData({ ...formData, type: newType, next_due_date: newType === 'vaccine' ? formData.next_due_date : null })
+              }}
             >
               <option value="vaccine">{t('vaccine')}</option>
               <option value="allergy">{t('allergy')}</option>
@@ -71,6 +76,17 @@ export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRec
               onChange={(e) => setFormData({ ...formData, record_date: e.target.value })}
             />
           </div>
+          {formData.type === 'vaccine' && (
+            <div className="space-y-2">
+              <Label htmlFor="next-due-date">{t('nextDueDate')}</Label>
+              <Input
+                id="next-due-date"
+                type="date"
+                value={formData.next_due_date ?? ''}
+                onChange={(e) => setFormData({ ...formData, next_due_date: e.target.value || null })}
+              />
+            </div>
+          )}
           <div className="space-y-2">
             <Label>{t('description')}</Label>
             <textarea

@@ -26,6 +26,8 @@ const mockRecord: HealthRecord = {
   type: 'vaccine',
   description: 'Rabies vaccine',
   record_date: '2024-01-15',
+  next_due_date: null,
+  reminder_sent_at: null,
   created_at: '2024-01-15T00:00:00Z',
 }
 

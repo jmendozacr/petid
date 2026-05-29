@@ -18,6 +18,9 @@ export function HealthRecordItem({ record, onDelete, isDeleting }: HealthRecordI
       <div>
         <p className="font-medium">{record.description}</p>
         <p className="text-sm text-muted-foreground">{record.record_date}</p>
+        {record.next_due_date && (
+          <p className="text-xs text-primary mt-1">{t('nextDueDateLabel')} {record.next_due_date}</p>
+        )}
       </div>
       <Button
         variant="ghost"

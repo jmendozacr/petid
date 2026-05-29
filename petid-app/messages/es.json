@@ -171,7 +171,9 @@
     "descriptionPlaceholder": "Ingresá los detalles...",
     "save": "Guardar registro",
     "descriptionRequired": "La descripción es requerida",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "nextDueDate": "Próxima fecha",
+    "nextDueDateLabel": "Próxima:"
   },
   "deleteConfirm": {
     "description": "¿Estás seguro de que querés eliminar a {name}? Esta acción no se puede deshacer.",
