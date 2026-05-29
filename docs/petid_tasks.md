@@ -115,7 +115,7 @@ Route: `/dashboard/settings`
 
 ## Phase 18 — Features de alto valor
 
-- [ ] **Recordatorios de vacunas**: agregar campo `next_due_date` a `health_records` para tipo `vaccine`. Enviar email automático N días antes via Supabase cron o Edge Function.
+- [x] **Recordatorios de vacunas**: agregar campo `next_due_date` a `health_records` para tipo `vaccine`. Enviar email automático N días antes via Supabase cron o Edge Function.
 - [ ] **Notificaciones push (web push / PWA)**: para alertas de mascota perdida, reemplazar o complementar email con push notifications. Mayor urgencia, menor latencia.
 - [ ] **Compartir alerta en redes**: al marcar mascota como perdida, ofrecer botón de compartir en WhatsApp / X con foto + link público. Difusión orgánica sin costo.
 - [ ] **Edad de la mascota visible**: calcular y mostrar la edad a partir de `birthdate` en la pet card y en la página pública.
