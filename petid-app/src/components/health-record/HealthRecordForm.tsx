@@ -15,7 +15,7 @@ interface HealthRecordFormProps {
   isSubmitting?: boolean
 }
 
-export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRecordFormProps) {
+export function HealthRecordForm({ onSubmit, isSubmitting }: HealthRecordFormProps) {
   const t = useTranslations('healthRecord')
   const [formData, setFormData] = useState<NewRecordData>({
     type: 'vaccine',

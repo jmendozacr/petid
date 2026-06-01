@@ -8,8 +8,11 @@ setup('authenticate', async ({ page }) => {
   const { email, password } = getTestCredentials()
 
   await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill(password)
+  await page.waitForLoadState('networkidle')
+  await page.getByLabel('Email').click()
+  await page.getByLabel('Email').pressSequentially(email)
+  await page.getByLabel('Password').click()
+  await page.getByLabel('Password').pressSequentially(password)
   await page.getByRole('button', { name: 'Sign In' }).click()
   await expect(page).toHaveURL('/dashboard')
 

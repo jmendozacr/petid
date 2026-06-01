@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
@@ -25,7 +25,7 @@ export default function PetDetailPage() {
   const router = useRouter()
   const petId = params.id as string
 
-  const { pet, loading: petLoading, error: petError, update, remove, uploadPhoto, reload, applyUpdate } = usePet(petId)
+  const { pet, loading: petLoading, error: petError, remove, uploadPhoto, applyUpdate } = usePet(petId)
   const { vaccines, allergies, medicalNotes, add, remove: removeRecord, loading: recordsLoading } = useHealthRecords(petId)
   const updatePet = usePetStore((s) => s.updatePet)
 

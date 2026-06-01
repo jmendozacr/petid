@@ -5,7 +5,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { PhotoDisplay } from '@/components/ui/photo-display'
-import { QRCode } from '@/components/qr-code'
 import { Button } from '@/components/ui/button'
 
 export const revalidate = 60

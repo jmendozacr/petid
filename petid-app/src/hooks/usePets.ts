@@ -23,6 +23,7 @@ export function usePets() {
       .catch((err) => { if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load pets') })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function clearError() {

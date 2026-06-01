@@ -6,6 +6,7 @@ interface PhotoDisplayProps {
 
 export function PhotoDisplay({ photoUrl, alt, iconClassName = 'h-16 w-16' }: PhotoDisplayProps) {
   if (photoUrl) {
+    // eslint-disable-next-line @next/next/no-img-element
     return <img src={photoUrl} alt={alt} className="w-full h-full object-cover" />
   }
 

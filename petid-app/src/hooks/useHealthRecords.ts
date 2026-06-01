@@ -29,6 +29,7 @@ export function useHealthRecords(petId: string) {
 
   useEffect(() => {
     loadRecords()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [petId])
 
   async function add(data: NewRecordData) {

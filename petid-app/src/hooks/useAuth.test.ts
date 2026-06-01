@@ -53,7 +53,7 @@ describe('useAuth - signIn', () => {
 
     const { result } = renderHook(() => useAuth())
 
-    let returned: { user: typeof mockUser | null } = { user: null }
+    let returned: Awaited<ReturnType<typeof result.current.signIn>> = { user: null }
     await act(async () => {
       returned = await result.current.signIn('user@example.com', 'password123')
     })
