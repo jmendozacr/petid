@@ -160,6 +160,6 @@ Route: `/dashboard/settings`
 ## Phase 20 — Cobertura E2E ampliada
 
 - [x] **E2E: Login y crear mascota**: flujo de autenticación (email/password) + onboarding de primera mascota. Camino crítico del usuario nuevo.
-- [ ] **E2E: Marcar mascota como perdida**: toggle lost pet desde el dashboard, verificar banner en página pública.
-- [ ] **E2E: Editar y eliminar mascota**: flujo de edición + modal de confirmación de eliminación.
+- [x] **E2E: Marcar mascota como perdida**: toggle lost pet desde el dashboard, verificar banner en página pública.
+- [x] **E2E: Editar y eliminar mascota**: flujo de edición + modal de confirmación de eliminación.
 - [ ] **E2E: Settings de notificaciones**: toggle de alertas + configuración de radio.
