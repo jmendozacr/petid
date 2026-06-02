@@ -4,11 +4,13 @@ import { BasePage } from '../base-page'
 export class PublicPetPage extends BasePage {
   readonly petHeading: Locator
   readonly ownerPhoneLink: Locator
+  readonly lostBanner: Locator
 
   constructor(page: Page) {
     super(page)
     this.petHeading = page.getByRole('heading', { level: 1 })
     this.ownerPhoneLink = page.locator('a[href^="tel:"]').first()
+    this.lostBanner = page.getByRole('img', { name: 'Alert' })
   }
 
   async navigate(petId: string): Promise<void> {
