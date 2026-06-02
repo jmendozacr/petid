@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { createPet, uploadPetPhoto, updatePet } from '@/services/pets-service'
 import type { Pet } from '@/types/pet'
 
@@ -26,11 +26,36 @@ export const initialFormData: PetFormData = {
   emergency_contact: '',
 }
 
-export function usePetForm() {
-  const [formData, setFormData] = useState<PetFormData>(initialFormData)
+function petToFormData(pet: Pet): PetFormData {
+  return {
+    name: pet.name,
+    species: pet.species ?? '',
+    breed: pet.breed ?? '',
+    birthdate: pet.birthdate ?? '',
+    color: pet.color ?? '',
+    weight: pet.weight?.toString() ?? '',
+    microchip_id: pet.microchip_id ?? '',
+    owner_phone: pet.owner_phone ?? '',
+    emergency_contact: pet.emergency_contact ?? '',
+  }
+}
+
+export function usePetForm(initialPet?: Pet) {
+  const [formData, setFormData] = useState<PetFormData>(
+    initialPet ? petToFormData(initialPet) : initialFormData
+  )
   const [pendingPhoto, setPendingPhoto] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Sync when initialPet arrives async (e.g. after usePet resolves on edit page).
+  useEffect(() => {
+    if (initialPet) {
+      setFormData(petToFormData(initialPet))
+    }
+    // Keyed on ID only — re-init when the pet identity changes, not on every partial field update.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPet?.id])
 
   const handleChange = useCallback((field: keyof PetFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -62,6 +87,10 @@ export function usePetForm() {
         emergency_contact: formData.emergency_contact || null,
       }
 
+      if (initialPet) {
+        return await updatePet(initialPet.id, petData)
+      }
+
       let pet = await createPet(petData)
 
       if (pendingPhoto) {
@@ -76,13 +105,13 @@ export function usePetForm() {
     } finally {
       setLoading(false)
     }
-  }, [formData, pendingPhoto])
+  }, [formData, pendingPhoto, initialPet])
 
   const reset = useCallback(() => {
-    setFormData(initialFormData)
+    setFormData(initialPet ? petToFormData(initialPet) : initialFormData)
     setPendingPhoto(null)
     setError(null)
-  }, [])
+  }, [initialPet])
 
   return {
     formData,

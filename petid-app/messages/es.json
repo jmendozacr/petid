@@ -110,7 +110,15 @@
     "recoverySuccessMessage": "El banner de perdida fue removido de la página pública.",
     "recoveryReporterLabel": "Contacto del último reporte:",
     "recoveryNoReporter": "No se recibieron reportes.",
-    "recoveryDismiss": "Listo"
+    "recoveryDismiss": "Listo",
+    "editPet": "Editar mascota"
+  },
+  "editPet": {
+    "title": "Editar mascota",
+    "subtitle": "Actualizá la información de tu mascota",
+    "cancel": "Cancelar",
+    "submit": "Guardar cambios",
+    "submitting": "Guardando..."
   },
   "publicPet": {
     "lostTitle": "MASCOTA PERDIDA",

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
@@ -160,6 +161,9 @@ export default function PetDetailPage() {
             lostSince={pet.lost_since ?? null}
             onToggled={handleToggled}
           />
+          <Button variant="outline" asChild>
+            <Link href={`/dashboard/pets/${pet.id}/edit`}>{t('editPet')}</Link>
+          </Button>
           <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
             {t('deletePet')}
           </Button>

@@ -110,7 +110,15 @@
     "recoverySuccessMessage": "The lost banner has been removed from the public page.",
     "recoveryReporterLabel": "Contact from last report:",
     "recoveryNoReporter": "No reports were submitted.",
-    "recoveryDismiss": "Done"
+    "recoveryDismiss": "Done",
+    "editPet": "Edit Pet"
+  },
+  "editPet": {
+    "title": "Edit Pet",
+    "subtitle": "Update your pet's information",
+    "cancel": "Cancel",
+    "submit": "Save Changes",
+    "submitting": "Saving..."
   },
   "publicPet": {
     "lostTitle": "LOST PET",

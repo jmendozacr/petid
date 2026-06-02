@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { usePetForm } from './usePetForm'
-import { createPet } from '@/services/pets-service'
+import { createPet, updatePet } from '@/services/pets-service'
 import type { Pet } from '@/types/pet'
 
 vi.mock('@/services/pets-service')
@@ -104,5 +104,76 @@ describe('usePetForm', () => {
 
     expect(result.current.formData.name).toBe('')
     expect(result.current.error).toBeNull()
+  })
+})
+
+describe('usePetForm — edit mode', () => {
+  const existingPet: Pet = {
+    id: 'pet-42',
+    user_id: 'user-1',
+    name: 'Fluffy',
+    species: 'Cat',
+    breed: 'Siamese',
+    birthdate: '2020-03-15',
+    color: 'white',
+    weight: 4.5,
+    microchip_id: 'ABC123',
+    photo_url: null,
+    owner_phone: '+1234567890',
+    emergency_contact: '+0987654321',
+    is_lost: false,
+    lost_since: null,
+    lost_lat: null,
+    lost_lng: null,
+    created_at: '2024-01-01T00:00:00Z',
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('REQ-01.1 — initializes formData from initialPet', () => {
+    const { result } = renderHook(() => usePetForm(existingPet))
+
+    expect(result.current.formData.name).toBe('Fluffy')
+    expect(result.current.formData.species).toBe('Cat')
+    expect(result.current.formData.breed).toBe('Siamese')
+    expect(result.current.formData.weight).toBe('4.5')
+  })
+
+  it('REQ-01.1 — converts null fields to empty strings', () => {
+    const petWithNulls: Pet = { ...existingPet, species: null, breed: null, weight: null }
+    const { result } = renderHook(() => usePetForm(petWithNulls))
+
+    expect(result.current.formData.species).toBe('')
+    expect(result.current.formData.breed).toBe('')
+    expect(result.current.formData.weight).toBe('')
+  })
+
+  it('REQ-02.1 — submit calls updatePet and returns updated pet', async () => {
+    const updatedPet = { ...existingPet, name: 'Max' }
+    vi.mocked(updatePet).mockResolvedValue(updatedPet)
+
+    const { result } = renderHook(() => usePetForm(existingPet))
+    act(() => { result.current.handleChange('name', 'Max') })
+
+    let returned: Pet | null = null
+    await act(async () => { returned = await result.current.submit() })
+
+    expect(updatePet).toHaveBeenCalledWith('pet-42', expect.objectContaining({ name: 'Max' }))
+    expect(createPet).not.toHaveBeenCalled()
+    expect(returned).toEqual(updatedPet)
+  })
+
+  it('REQ-03.1 — submit with empty name does not call updatePet and sets error', async () => {
+    const { result } = renderHook(() => usePetForm(existingPet))
+    act(() => { result.current.handleChange('name', '') })
+
+    let returned: Pet | null = existingPet
+    await act(async () => { returned = await result.current.submit() })
+
+    expect(returned).toBeNull()
+    expect(result.current.error).toBe('El nombre de la mascota es requerido')
+    expect(updatePet).not.toHaveBeenCalled()
   })
 })
