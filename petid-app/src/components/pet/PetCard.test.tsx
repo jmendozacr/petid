@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { render as renderRTL } from '@testing-library/react'
 import { render, screen } from '@/test/test-utils'
+import { NextIntlClientProvider } from 'next-intl'
+import esMessages from '../../../messages/es.json'
 import { PetCard } from './PetCard'
 import type { Pet } from '@/types/pet'
 
@@ -24,6 +27,15 @@ const mockPet: Pet = {
 }
 
 describe('PetCard', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-06-02'))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('renders pet name', () => {
     render(<PetCard pet={mockPet} />)
 
@@ -58,5 +70,54 @@ describe('PetCard', () => {
 
     const link = screen.getByRole('link', { name: /view details/i })
     expect(link).toHaveAttribute('href', '/dashboard/pets/pet-1')
+  })
+
+  it('renders age in overlay when birthdate is provided', () => {
+    const petWithBirthdate = { ...mockPet, birthdate: '2024-03-01' }
+    render(<PetCard pet={petWithBirthdate} />)
+
+    expect(screen.getByText(/2 years 3 months/i)).toBeInTheDocument()
+  })
+
+  it('does not render age when birthdate is null', () => {
+    render(<PetCard pet={mockPet} />)
+
+    expect(screen.queryByText(/\d+ year|\d+ month/i)).toBeNull()
+  })
+
+  it('renders "1 year" in EN locale (singular)', () => {
+    const pet = { ...mockPet, birthdate: '2025-06-02' }
+    render(<PetCard pet={pet} />)
+
+    expect(screen.getByText(/\b1 year\b/)).toBeInTheDocument()
+  })
+
+  it('renders "2 years" in EN locale (plural)', () => {
+    const pet = { ...mockPet, birthdate: '2024-06-02' }
+    render(<PetCard pet={pet} />)
+
+    expect(screen.getByText(/\b2 years\b/)).toBeInTheDocument()
+  })
+
+  it('renders "1 mes" in ES locale (singular month)', () => {
+    const pet = { ...mockPet, birthdate: '2026-05-02' }
+    const { getByText } = renderRTL(
+      <NextIntlClientProvider locale="es" messages={esMessages}>
+        <PetCard pet={pet} />
+      </NextIntlClientProvider>
+    )
+
+    expect(getByText(/\b1 mes\b/)).toBeInTheDocument()
+  })
+
+  it('renders "5 meses" in ES locale (plural months)', () => {
+    const pet = { ...mockPet, birthdate: '2026-01-02' }
+    const { getByText } = renderRTL(
+      <NextIntlClientProvider locale="es" messages={esMessages}>
+        <PetCard pet={pet} />
+      </NextIntlClientProvider>
+    )
+
+    expect(getByText(/\b5 meses\b/)).toBeInTheDocument()
   })
 })

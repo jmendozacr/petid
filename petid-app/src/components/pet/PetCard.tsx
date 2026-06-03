@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { PhotoDisplay } from '@/components/ui/photo-display'
+import { calculatePetAge } from '@/lib/pet-age'
 import type { Pet } from '@/types/pet'
 
 interface PetCardProps {
@@ -11,6 +12,17 @@ interface PetCardProps {
 
 export function PetCard({ pet }: PetCardProps) {
   const t = useTranslations('petCard')
+  const tAge = useTranslations('petAge')
+
+  const age = calculatePetAge(pet.birthdate)
+  const ageStr = (() => {
+    if (!age || (age.years === 0 && age.months === 0)) return null
+    if (age.years === 0) return tAge('months', { count: age.months })
+    if (age.months === 0) return tAge('years', { count: age.years })
+    return `${tAge('years', { count: age.years })} ${tAge('months', { count: age.months })}`
+  })()
+
+  const breedAge = [pet.breed, ageStr].filter(Boolean).join(' · ')
 
   return (
     <Link
@@ -43,8 +55,8 @@ export function PetCard({ pet }: PetCardProps) {
           {/* Pet info overlay at bottom */}
           <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-0.5 group-hover:translate-y-0 transition-transform duration-300">
             <h3 className="font-heading text-white text-xl font-semibold leading-tight">{pet.name}</h3>
-            {pet.breed && (
-              <p className="text-white/70 text-sm mt-0.5">{pet.breed}</p>
+            {breedAge && (
+              <p className="text-white/70 text-sm mt-0.5">{breedAge}</p>
             )}
           </div>
         </div>

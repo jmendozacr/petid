@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { PhotoDisplay } from '@/components/ui/photo-display'
 import { Button } from '@/components/ui/button'
+import { calculatePetAge } from '@/lib/pet-age'
 
 export const revalidate = 60
 
@@ -79,8 +80,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default async function PublicPetPage({ params }: PageProps) {
   const { id: petId } = await params
-  const [t, locale, { pet, records }] = await Promise.all([
+  const [t, tAge, locale, { pet, records }] = await Promise.all([
     getTranslations('publicPet'),
+    getTranslations('petAge'),
     getLocale(),
     getPet(petId),
   ])
@@ -97,6 +99,14 @@ export default async function PublicPetPage({ params }: PageProps) {
     .single()
 
   const displayPhone = ownerProfile?.phone ?? pet.owner_phone
+
+  const age = calculatePetAge(pet.birthdate)
+  const ageStr = (() => {
+    if (!age || (age.years === 0 && age.months === 0)) return null
+    if (age.years === 0) return tAge('months', { count: age.months })
+    if (age.months === 0) return tAge('years', { count: age.years })
+    return `${tAge('years', { count: age.years })} ${tAge('months', { count: age.months })}`
+  })()
 
   const allergies = records?.filter(r => r.type === 'allergy') || []
   const medicalNotes = records?.filter(r => r.type === 'medical_note') || []
@@ -139,7 +149,7 @@ export default async function PublicPetPage({ params }: PageProps) {
         <div className="pt-2 pb-2 animate-fade-up">
           <h1 className="font-heading text-5xl font-bold text-foreground leading-tight">{pet.name}</h1>
           <p className="text-muted-foreground text-lg mt-1">
-            {pet.species}{pet.breed && ` · ${pet.breed}`}
+            {pet.species}{pet.breed && ` · ${pet.breed}`}{ageStr && ` · ${ageStr}`}
           </p>
         </div>
 

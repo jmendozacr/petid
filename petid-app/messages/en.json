@@ -212,6 +212,10 @@
     "alertRadius5km": "5 km",
     "alertRadius10km": "10 km"
   },
+  "petAge": {
+    "years": "{count, plural, one {# year} other {# years}}",
+    "months": "{count, plural, one {# month} other {# months}}"
+  },
   "language": {
     "en": "EN",
     "es": "ES"
