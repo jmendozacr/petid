@@ -69,6 +69,8 @@
     "markAsFound": "Mark as Found",
     "updating": "Updating...",
     "lostSince": "Lost since: {date}",
+    "statusHome": "At home",
+    "statusLost": "Pet lost",
     "confirmLostTitle": "Mark as Lost?",
     "confirmLostDescription": "This will show a LOST PET banner on your pet's public page so anyone who finds them knows to contact you.",
     "confirmLostAction": "Yes, mark as lost",

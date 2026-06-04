@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useLostPetToggle } from '@/hooks/useLostPetToggle'
+import { cn } from '@/lib/utils'
 import type { Pet } from '@/types/pet'
 
 interface LostPetToggleButtonProps {
@@ -41,19 +42,34 @@ export function LostPetToggleButton({ petId, isLost, lostSince, onToggled }: Los
 
   return (
     <>
-      <div className="space-y-1">
+      <div className={cn(
+        "flex items-center justify-between rounded-xl border px-4 py-3 transition-colors",
+        isLost ? "border-danger/40 bg-danger/5" : "border-border bg-card"
+      )}>
+        <div className="flex items-center gap-3">
+          <span className={cn(
+            "h-2.5 w-2.5 rounded-full flex-shrink-0",
+            isLost ? "bg-danger animate-pulse" : "bg-success"
+          )} />
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              {isLost ? t('statusLost') : t('statusHome')}
+            </p>
+            {isLost && lostSince && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {t('lostSince', { date: new Date(lostSince).toLocaleDateString() })}
+              </p>
+            )}
+          </div>
+        </div>
         <Button
           variant={isLost ? 'success' : 'destructive'}
+          size="sm"
           disabled={isLoading || isGeoLoading}
           onClick={handleClick}
         >
           {isLoading ? t('updating') : isLost ? t('markAsFound') : t('markAsLost')}
         </Button>
-        {isLost && lostSince && (
-          <p className="text-sm text-muted-foreground">
-            {t('lostSince', { date: new Date(lostSince).toLocaleDateString() })}
-          </p>
-        )}
       </div>
 
       {showConfirm && (
