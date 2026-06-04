@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
+import { DeleteConfirmModal } from '@/components/pet/DeleteConfirmModal'
 import type { HealthRecord } from '@/types/health-record'
 
 interface HealthRecordItemProps {
@@ -12,6 +14,7 @@ interface HealthRecordItemProps {
 
 export function HealthRecordItem({ record, onDelete, isDeleting }: HealthRecordItemProps) {
   const t = useTranslations('healthRecord')
+  const [showConfirm, setShowConfirm] = useState(false)
 
   return (
     <div className="flex items-start justify-between p-3 border rounded">
@@ -25,11 +28,22 @@ export function HealthRecordItem({ record, onDelete, isDeleting }: HealthRecordI
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => onDelete(record.id)}
+        onClick={() => setShowConfirm(true)}
         disabled={isDeleting}
       >
         {t('delete')}
       </Button>
+      <DeleteConfirmModal
+        isOpen={showConfirm}
+        title={t('deleteConfirmTitle')}
+        itemName={record.description}
+        loading={isDeleting ?? false}
+        onCancel={() => setShowConfirm(false)}
+        onConfirm={() => {
+          onDelete(record.id)
+          setShowConfirm(false)
+        }}
+      />
     </div>
   )
 }

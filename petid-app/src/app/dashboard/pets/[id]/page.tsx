@@ -13,7 +13,7 @@ import { LostPetToggleButton } from '@/components/pet/lost-pet-toggle-button'
 import { HealthRecordItem } from '@/components/health-record/HealthRecordItem'
 import { HealthRecordForm } from '@/components/health-record/HealthRecordForm'
 import { QRCode, getPublicPetUrl, downloadQRCode, sanitizePetName } from '@/components/qr-code'
-import { PhotoDisplay } from '@/components/ui/photo-display'
+import { PetPhotoUpload } from '@/components/pet/PetPhotoUpload'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -71,10 +71,7 @@ export default function PetDetailPage() {
     }
   }
 
-  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
+  async function handlePhotoChange(file: File) {
     setUploadingPhoto(true)
     try {
       await uploadPhoto(file)
@@ -180,23 +177,12 @@ export default function PetDetailPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-shrink-0">
-              <div className="w-48 h-48 rounded-lg overflow-hidden bg-muted relative">
-                <PhotoDisplay photoUrl={pet.photo_url} alt={pet.name} />
-                <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    disabled={uploadingPhoto}
-                    className="hidden"
-                  />
-                  <span className="text-white text-sm font-medium">
-                    {uploadingPhoto ? t('uploading') : t('uploadPhoto')}
-                  </span>
-                </label>
-              </div>
-            </div>
+            <PetPhotoUpload
+              photoUrl={pet.photo_url}
+              uploading={uploadingPhoto}
+              onPhotoChange={handlePhotoChange}
+              alt={pet.name}
+            />
             <div className="flex-1">
               <CardTitle className="text-3xl mb-2">{pet.name}</CardTitle>
               <CardDescription className="text-lg mb-4">

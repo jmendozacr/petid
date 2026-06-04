@@ -182,7 +182,9 @@
     "descriptionPlaceholder": "Enter details...",
     "save": "Save Record",
     "descriptionRequired": "Description is required",
+    "cancel": "Cancel",
     "delete": "Delete",
+    "deleteConfirmTitle": "Delete health record",
     "nextDueDate": "Next due date",
     "nextDueDateLabel": "Next due:"
   },

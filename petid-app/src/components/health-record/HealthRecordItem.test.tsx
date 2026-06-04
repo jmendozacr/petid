@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@/test/test-utils'
+import { render, screen, fireEvent, within } from '@/test/test-utils'
 import { HealthRecordItem } from './HealthRecordItem'
 import type { HealthRecord } from '@/types/health-record'
 
@@ -37,5 +37,40 @@ describe('HealthRecordItem', () => {
     delete (record as Partial<HealthRecord>).next_due_date
     render(<HealthRecordItem record={record as HealthRecord} onDelete={vi.fn()} />)
     expect(screen.getByText('Rabies')).toBeInTheDocument()
+  })
+
+  it('shows confirmation dialog on delete click without calling onDelete (REQ-01.1)', () => {
+    const onDelete = vi.fn()
+    render(<HealthRecordItem record={baseRecord} onDelete={onDelete} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+    expect(onDelete).not.toHaveBeenCalled()
+  })
+
+  it('calls onDelete with record id after confirmation (REQ-01.2)', () => {
+    const onDelete = vi.fn()
+    render(<HealthRecordItem record={baseRecord} onDelete={onDelete} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    const dialog = screen.getByRole('alertdialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: /^delete$/i }))
+
+    expect(onDelete).toHaveBeenCalledWith('r1')
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('closes dialog without calling onDelete when cancelled (REQ-02.1)', () => {
+    const onDelete = vi.fn()
+    render(<HealthRecordItem record={baseRecord} onDelete={onDelete} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(onDelete).not.toHaveBeenCalled()
   })
 })

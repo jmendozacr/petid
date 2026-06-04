@@ -182,7 +182,9 @@
     "descriptionPlaceholder": "Ingresá los detalles...",
     "save": "Guardar registro",
     "descriptionRequired": "La descripción es requerida",
+    "cancel": "Cancelar",
     "delete": "Eliminar",
+    "deleteConfirmTitle": "Eliminar registro de salud",
     "nextDueDate": "Próxima fecha",
     "nextDueDateLabel": "Próxima:"
   },

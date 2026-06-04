@@ -53,4 +53,48 @@ describe('HealthRecordForm', () => {
       expect.objectContaining({ next_due_date: '2025-06-01' }),
     )
   })
+
+  it('renders cancel button in form footer (REQ-01.1)', () => {
+    render(<HealthRecordForm onSubmit={vi.fn()} onCancel={vi.fn()} />)
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
+  })
+
+  it('calls onCancel when cancel button is clicked (REQ-01.2)', () => {
+    const onCancel = vi.fn()
+    render(<HealthRecordForm onSubmit={vi.fn()} onCancel={onCancel} />)
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
+    expect(onCancel).toHaveBeenCalledTimes(1)
+  })
+
+  it('associates description label with textarea via htmlFor/id (REQ-02.1)', () => {
+    render(<HealthRecordForm onSubmit={vi.fn()} onCancel={vi.fn()} />)
+    const textarea = screen.getByLabelText('Description')
+    expect(textarea.tagName.toLowerCase()).toBe('textarea')
+    expect(textarea).toHaveAttribute('id', 'description')
+  })
+
+  it('shows inline error and aria-invalid on empty description submit (REQ-03.1)', () => {
+    render(<HealthRecordForm onSubmit={vi.fn()} onCancel={vi.fn()} />)
+    fireEvent.submit(screen.getByRole('button', { name: /save record/i }).closest('form')!)
+    const textarea = screen.getByPlaceholderText(/enter details/i)
+    expect(textarea).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getAllByText(/description is required/i).length).toBeGreaterThan(0)
+  })
+
+  it('has no aria-invalid on textarea when description is valid (REQ-03.2)', () => {
+    render(<HealthRecordForm onSubmit={vi.fn()} onCancel={vi.fn()} />)
+    fireEvent.change(screen.getByPlaceholderText(/enter details/i), {
+      target: { value: 'Rabies vaccine' },
+    })
+    fireEvent.submit(screen.getByRole('button', { name: /save record/i }).closest('form')!)
+    const textarea = screen.getByPlaceholderText(/enter details/i)
+    expect(textarea).not.toHaveAttribute('aria-invalid', 'true')
+  })
+
+  it('moves focus to description textarea after failed submit (REQ-04.1)', () => {
+    render(<HealthRecordForm onSubmit={vi.fn()} onCancel={vi.fn()} />)
+    fireEvent.submit(screen.getByRole('button', { name: /save record/i }).closest('form')!)
+    const textarea = screen.getByPlaceholderText(/enter details/i)
+    expect(document.activeElement).toBe(textarea)
+  })
 })

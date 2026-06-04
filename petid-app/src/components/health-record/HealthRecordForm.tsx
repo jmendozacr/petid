@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,7 +15,7 @@ interface HealthRecordFormProps {
   isSubmitting?: boolean
 }
 
-export function HealthRecordForm({ onSubmit, isSubmitting }: HealthRecordFormProps) {
+export function HealthRecordForm({ onSubmit, onCancel, isSubmitting }: HealthRecordFormProps) {
   const t = useTranslations('healthRecord')
   const [formData, setFormData] = useState<NewRecordData>({
     type: 'vaccine',
@@ -24,11 +24,13 @@ export function HealthRecordForm({ onSubmit, isSubmitting }: HealthRecordFormPro
     next_due_date: null,
   })
   const [error, setError] = useState<string | null>(null)
+  const descriptionRef = useRef<HTMLTextAreaElement>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.description.trim()) {
       setError(t('descriptionRequired'))
+      descriptionRef.current?.focus()
       return
     }
     setError(null)
@@ -88,17 +90,24 @@ export function HealthRecordForm({ onSubmit, isSubmitting }: HealthRecordFormPro
             </div>
           )}
           <div className="space-y-2">
-            <Label>{t('description')}</Label>
+            <Label htmlFor="description">{t('description')}</Label>
             <textarea
+              id="description"
+              ref={descriptionRef}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               placeholder={t('descriptionPlaceholder')}
+              aria-invalid={!!error || undefined}
             />
+            {error && (
+              <p className="text-sm text-danger mt-1">{error}</p>
+            )}
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex gap-2">
           <Button type="submit" disabled={isSubmitting}>{t('save')}</Button>
+          <Button type="button" variant="outline" onClick={onCancel}>{t('cancel')}</Button>
         </CardFooter>
       </form>
     </Card>
