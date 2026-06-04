@@ -71,6 +71,7 @@
     "lostSince": "Perdida desde: {date}",
     "statusHome": "En casa",
     "statusLost": "Mascota perdida",
+    "loading": "Cargando...",
     "confirmLostTitle": "¿Marcar como perdida?",
     "confirmLostDescription": "Esto mostrará un banner de MASCOTA PERDIDA en la página pública de tu mascota para que quien la encuentre sepa cómo contactarte.",
     "confirmLostAction": "Sí, marcar como perdida",

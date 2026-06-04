@@ -252,6 +252,47 @@ describe('LostPetToggleButton', () => {
     })
   })
 
+  // REQ-05.1: confirm modal has aria attributes
+  it('confirm modal has aria-modal, aria-labelledby, aria-describedby (REQ-05.1)', () => {
+    render(<LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Lost' }))
+
+    const dialog = screen.getByRole('dialog')
+    expect(dialog).toHaveAttribute('aria-modal', 'true')
+    expect(dialog).toHaveAttribute('aria-labelledby')
+    expect(dialog).toHaveAttribute('aria-describedby')
+  })
+
+  // REQ-06.1 + REQ-06.2: Radix Dialog manages scroll lock via react-remove-scroll.
+  // jsdom does not implement native scroll so we verify open/close state instead.
+  it('dialog opens and closes correctly — scroll lock managed by Radix (REQ-06.1, REQ-06.2)', () => {
+    render(<LostPetToggleButton petId="pet-1" isLost={false} lostSince={null} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Lost' }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  // REQ-07.1: 🎉 emoji has aria-hidden in recovery modal
+  it('🎉 emoji has aria-hidden="true" in recovery modal (REQ-07.1)', async () => {
+    mockToggle.mockResolvedValueOnce(mockPet)
+    render(<LostPetToggleButton petId="pet-1" isLost={true} lostSince={null} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as Found' }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, mark as found/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    const dialog = screen.getByRole('dialog')
+    const emojiSpans = dialog.querySelectorAll('span[aria-hidden="true"]')
+    const hasPartyEmoji = Array.from(emojiSpans).some(s => s.textContent?.includes('🎉'))
+    expect(hasPartyEmoji).toBe(true)
+  })
+
   // REQ-03.2: no contact section when no foundReport
   it('shows no-reporter fallback when foundReport is null (REQ-03.2)', async () => {
     mockFoundReport.value = null

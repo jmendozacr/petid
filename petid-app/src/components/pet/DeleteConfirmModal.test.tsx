@@ -49,4 +49,15 @@ describe('DeleteConfirmModal', () => {
     expect(screen.getByRole('button', { name: /deleting/i })).toBeDisabled()
     expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled()
   })
+
+  // REQ-04.1, REQ-05.1
+  it('has alertdialog role and required aria attributes when open', () => {
+    render(<DeleteConfirmModal {...defaultProps} />)
+
+    const dialog = screen.getByRole('alertdialog')
+    expect(dialog).toBeInTheDocument()
+    expect(dialog).toHaveAttribute('aria-modal', 'true')
+    expect(dialog).toHaveAttribute('aria-labelledby')
+    expect(dialog).toHaveAttribute('aria-describedby')
+  })
 })

@@ -105,7 +105,8 @@ export default function PetDetailPage() {
 
   if (petLoading || recordsLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
+      <div className="space-y-6 animate-pulse" aria-busy="true">
+        <span className="sr-only" aria-live="polite">{t('loading')}</span>
         <div className="flex items-center justify-between">
           <div className="h-9 w-20 rounded-md bg-muted" />
           <div className="h-9 w-24 rounded-md bg-muted" />
