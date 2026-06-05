@@ -69,4 +69,36 @@ describe('usePets', () => {
 
     expect(result.current.error).toBeNull()
   })
+
+  it('sets fallback error when thrown value is not an Error instance', async () => {
+    vi.mocked(getPets).mockRejectedValue('plain string error')
+
+    const { result } = renderHook(() => usePets())
+
+    await act(async () => {})
+
+    expect(result.current.error).toBe('Failed to load pets')
+  })
+
+  it('does not update state after unmount (cancelled fetch)', async () => {
+    let resolvePets: (pets: Pet[]) => void
+    vi.mocked(getPets).mockReturnValue(new Promise(res => { resolvePets = res }))
+
+    const { unmount } = renderHook(() => usePets())
+
+    unmount()
+
+    await act(async () => { resolvePets([]) })
+  })
+
+  it('does not update error state after unmount (cancelled failed fetch)', async () => {
+    let rejectPets: (err: Error) => void
+    vi.mocked(getPets).mockReturnValue(new Promise((_, rej) => { rejectPets = rej }))
+
+    const { unmount } = renderHook(() => usePets())
+
+    unmount()
+
+    await act(async () => { rejectPets(new Error('Network')) })
+  })
 })

@@ -111,6 +111,20 @@ describe('useAuth - signUp', () => {
     expect(result.current.error).toBeNull()
   })
 
+  it('sets error on signUp auth failure', async () => {
+    mockSignUp.mockResolvedValueOnce({ error: { message: 'Email already exists' } })
+
+    const { result } = renderHook(() => useAuth())
+
+    let returned = { success: true }
+    await act(async () => {
+      returned = await result.current.signUp({ email: 'user@example.com', password: 'password123', fullName: 'John' })
+    })
+
+    expect(returned.success).toBe(false)
+    expect(result.current.error).toBe('Email already exists')
+  })
+
   it('passes fullName and phone as metadata options to signUp', async () => {
     mockSignUp.mockResolvedValueOnce({ error: null })
 
@@ -125,6 +139,34 @@ describe('useAuth - signUp', () => {
       password: 'password123',
       options: { data: { full_name: 'Jane Doe', phone: '+54911' } },
     })
+  })
+
+  it('sets error and returns failure when signUp throws an Error', async () => {
+    mockSignUp.mockRejectedValueOnce(new Error('Network failure'))
+
+    const { result } = renderHook(() => useAuth())
+
+    let returned = { success: true }
+    await act(async () => {
+      returned = await result.current.signUp({ email: 'user@example.com', password: 'password123', fullName: 'John' })
+    })
+
+    expect(returned.success).toBe(false)
+    expect(result.current.error).toBe('Network failure')
+  })
+
+  it('sets fallback error when signUp throws a non-Error', async () => {
+    mockSignUp.mockRejectedValueOnce('plain string error')
+
+    const { result } = renderHook(() => useAuth())
+
+    let returned = { success: true }
+    await act(async () => {
+      returned = await result.current.signUp({ email: 'user@example.com', password: 'password123', fullName: 'John' })
+    })
+
+    expect(returned.success).toBe(false)
+    expect(result.current.error).toBe('Sign up failed')
   })
 })
 
@@ -179,6 +221,40 @@ describe('useAuth - signInWithGoogle', () => {
     })
 
     expect(result.current.error).toBe('OAuth failed')
+  })
+
+  it('sets error and returns error object when signInWithOAuth throws an Error', async () => {
+    mockSignInWithOAuth.mockRejectedValueOnce(new Error('OAuth network error'))
+
+    const { result } = renderHook(() => useAuth())
+
+    let returned: { error: { message: string } | null } = { error: null }
+    await act(async () => { returned = await result.current.signInWithGoogle() })
+
+    expect(result.current.error).toBe('OAuth network error')
+    expect(returned.error?.message).toBe('OAuth network error')
+  })
+
+  it('sets fallback error when signInWithOAuth throws a non-Error', async () => {
+    mockSignInWithOAuth.mockRejectedValueOnce('plain oauth error')
+
+    const { result } = renderHook(() => useAuth())
+
+    await act(async () => { await result.current.signInWithGoogle() })
+
+    expect(result.current.error).toBe('Google sign in failed')
+  })
+})
+
+describe('useAuth - signOut', () => {
+  it('calls signOut on the supabase auth client', async () => {
+    mockSignOut.mockResolvedValueOnce({ error: null })
+
+    const { result } = renderHook(() => useAuth())
+
+    await act(async () => { await result.current.signOut() })
+
+    expect(mockSignOut).toHaveBeenCalled()
   })
 })
 

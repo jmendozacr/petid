@@ -176,6 +176,27 @@ describe('useLostPetToggle', () => {
     expect(result.current.foundReport).toBeNull()
   })
 
+  it('sets fallback error message when result has no error field (line 28 ?? branch)', async () => {
+    mockToggleLostPetStatus.mockResolvedValueOnce({ success: false })
+
+    const { result } = renderHook(() => useLostPetToggle('pet-1'))
+
+    await act(async () => { await result.current.toggle(true) })
+
+    expect(result.current.error).toBe('Unknown error')
+  })
+
+  it('returns null when successful result has no pet field (line 36 ?? branch)', async () => {
+    mockToggleLostPetStatus.mockResolvedValueOnce({ success: true })
+
+    const { result } = renderHook(() => useLostPetToggle('pet-1'))
+
+    let returnedPet: ReturnType<typeof result.current.toggle> | null = null
+    await act(async () => { returnedPet = await result.current.toggle(false) })
+
+    expect(await returnedPet).toBeNull()
+  })
+
   // foundReport cleared at the start of each toggle call
   it('clears foundReport at the start of a new toggle call', async () => {
     mockToggleLostPetStatus.mockResolvedValueOnce({

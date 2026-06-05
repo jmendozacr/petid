@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { usePet } from './usePet'
-import { getPetById, updatePet, deletePet } from '@/services/pets-service'
+import { getPetById, updatePet, deletePet, uploadPetPhoto } from '@/services/pets-service'
 import type { Pet } from '@/types/pet'
 
 vi.mock('@/services/pets-service')
@@ -63,6 +63,16 @@ describe('usePet', () => {
     expect(result.current.error).toBe('Network error')
   })
 
+  it('sets fallback error message when service throws a non-Error', async () => {
+    vi.mocked(getPetById).mockRejectedValue('plain string error')
+
+    const { result } = renderHook(() => usePet('pet-1'))
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.error).toBe('Failed to load pet')
+  })
+
   it('update calls updatePet service and sets new pet', async () => {
     vi.mocked(getPetById).mockResolvedValue(mockPet)
     const updated = { ...mockPet, name: 'Buddy Jr.' }
@@ -90,5 +100,24 @@ describe('usePet', () => {
     })
 
     expect(deletePet).toHaveBeenCalledWith('pet-1')
+  })
+
+  it('uploadPhoto calls uploadPetPhoto and updates pet with new photo_url', async () => {
+    vi.mocked(getPetById).mockResolvedValue(mockPet)
+    vi.mocked(uploadPetPhoto as ReturnType<typeof vi.fn>).mockResolvedValue('https://cdn.example.com/photo.jpg')
+    vi.mocked(updatePet).mockResolvedValue({ ...mockPet, photo_url: 'https://cdn.example.com/photo.jpg' })
+
+    const { result } = renderHook(() => usePet('pet-1'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const file = new File(['bytes'], 'photo.jpg', { type: 'image/jpeg' })
+    let photoUrl: string | undefined
+
+    await act(async () => {
+      photoUrl = await result.current.uploadPhoto(file)
+    })
+
+    expect(photoUrl).toBe('https://cdn.example.com/photo.jpg')
+    expect(result.current.pet?.photo_url).toBe('https://cdn.example.com/photo.jpg')
   })
 })

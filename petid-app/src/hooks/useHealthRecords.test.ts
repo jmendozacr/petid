@@ -127,4 +127,38 @@ describe('useHealthRecords', () => {
 
     expect(result.current.records).toHaveLength(2)
   })
+
+  it('sets error when loadRecords fails with an Error', async () => {
+    vi.mocked(getHealthRecords).mockRejectedValue(new Error('Network error'))
+
+    const { result } = renderHook(() => useHealthRecords('pet-1'))
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.error).toBe('Network error')
+    expect(result.current.records).toHaveLength(0)
+  })
+
+  it('sets fallback error message when loadRecords throws a non-Error', async () => {
+    vi.mocked(getHealthRecords).mockRejectedValue('something went wrong')
+
+    const { result } = renderHook(() => useHealthRecords('pet-1'))
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.error).toBe('Failed to load records')
+  })
+
+  it('reload re-fetches records', async () => {
+    vi.mocked(getHealthRecords).mockResolvedValueOnce([mockVaccine]).mockResolvedValueOnce([mockVaccine, mockAllergy])
+
+    const { result } = renderHook(() => useHealthRecords('pet-1'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.records).toHaveLength(1)
+
+    await act(async () => { await result.current.reload() })
+
+    expect(result.current.records).toHaveLength(2)
+  })
 })

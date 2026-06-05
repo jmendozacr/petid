@@ -28,4 +28,27 @@ describe('PetPhotoUpload', () => {
 
     expect(onPhotoChange).toHaveBeenCalledWith(file)
   })
+
+  it('does not call onPhotoChange when no file is selected', () => {
+    const onPhotoChange = vi.fn()
+    render(<PetPhotoUpload photoUrl={null} uploading={false} onPhotoChange={onPhotoChange} alt="Buddy" />)
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+
+    fireEvent.change(fileInput, { target: { files: [] } })
+
+    expect(onPhotoChange).not.toHaveBeenCalled()
+  })
+
+  it('shows uploading label and disables input when uploading=true', () => {
+    render(<PetPhotoUpload photoUrl={null} uploading={true} onPhotoChange={vi.fn()} alt="Buddy" />)
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    expect(fileInput.disabled).toBe(true)
+    expect(screen.getByRole('button', { name: /uploading/i })).toBeInTheDocument()
+  })
+
+  it('renders with a photo url', () => {
+    render(<PetPhotoUpload photoUrl="https://cdn.example.com/photo.jpg" uploading={false} onPhotoChange={vi.fn()} alt="Buddy" />)
+    expect(screen.getByRole('button', { name: /upload photo/i })).toBeInTheDocument()
+  })
 })

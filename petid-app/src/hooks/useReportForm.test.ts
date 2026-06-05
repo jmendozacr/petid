@@ -135,6 +135,45 @@ describe('useReportForm', () => {
     expect(mockUploadReportPhoto).not.toHaveBeenCalled()
   })
 
+  it('sets fallback error when insert returns null report with no error (line 56 ?? branch)', async () => {
+    mockSingle.mockResolvedValueOnce({ data: null, error: null })
+
+    const { result } = renderHook(() => useReportForm('pet-1'))
+    act(() => { result.current.handleChange('message', 'Found your pet') })
+
+    let returned = true
+    await act(async () => { returned = await result.current.submit() })
+
+    expect(returned).toBe(false)
+    expect(result.current.error).toBe('Failed to submit report')
+  })
+
+  it('sets error.message in catch when Supabase throws an Error (line 71 true branch)', async () => {
+    mockSingle.mockRejectedValueOnce(new Error('Network failure'))
+
+    const { result } = renderHook(() => useReportForm('pet-1'))
+    act(() => { result.current.handleChange('message', 'Found your pet') })
+
+    let returned = true
+    await act(async () => { returned = await result.current.submit() })
+
+    expect(returned).toBe(false)
+    expect(result.current.error).toBe('Network failure')
+  })
+
+  it('sets fallback error message when thrown value is not an Error', async () => {
+    mockSingle.mockRejectedValue('plain string error')
+
+    const { result } = renderHook(() => useReportForm('pet-1'))
+    act(() => { result.current.handleChange('message', 'Found your pet') })
+
+    let returned = true
+    await act(async () => { returned = await result.current.submit() })
+
+    expect(returned).toBe(false)
+    expect(result.current.error).toBe('Failed to submit report')
+  })
+
   it('reset clears form and success state', async () => {
     const { result } = renderHook(() => useReportForm('pet-1'))
     act(() => { result.current.handleChange('message', 'Found your pet') })

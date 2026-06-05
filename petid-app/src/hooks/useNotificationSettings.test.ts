@@ -124,4 +124,93 @@ describe('useNotificationSettings', () => {
     expect(result.current.isSaving).toBe(false)
     expect(result.current.error).toBeNull()
   })
+
+  it('toggleOptIn flips notify_nearby_lost_pets and persists (toggleOptIn happy path)', async () => {
+    const { result } = renderHook(() => useNotificationSettings())
+    await act(async () => {})
+
+    await act(async () => { await result.current.toggleOptIn() })
+
+    expect(vi.mocked(updateNotificationSettings)).toHaveBeenCalledWith('user-1', {
+      notify_nearby_lost_pets: false,
+    })
+    expect(result.current.settings?.notify_nearby_lost_pets).toBe(false)
+  })
+
+  it('toggleOptIn reverts and sets error on DB failure (toggleOptIn error path)', async () => {
+    vi.mocked(updateNotificationSettings).mockResolvedValueOnce({
+      success: false,
+      error: 'Toggle failed',
+    })
+
+    const { result } = renderHook(() => useNotificationSettings())
+    await act(async () => {})
+
+    await act(async () => { await result.current.toggleOptIn() })
+
+    expect(result.current.settings?.notify_nearby_lost_pets).toBe(true)
+    expect(result.current.error).toBe('Toggle failed')
+  })
+
+  it('saveAlertLocation persists lat/lng and updates state (saveAlertLocation happy path)', async () => {
+    const { result } = renderHook(() => useNotificationSettings())
+    await act(async () => {})
+
+    await act(async () => { await result.current.saveAlertLocation(10.5, -74.0) })
+
+    expect(vi.mocked(updateNotificationSettings)).toHaveBeenCalledWith('user-1', {
+      notification_lat: 10.5,
+      notification_lng: -74.0,
+    })
+    expect(result.current.settings?.notification_lat).toBe(10.5)
+  })
+
+  it('saveAlertLocation sets error on DB failure (saveAlertLocation error path)', async () => {
+    vi.mocked(updateNotificationSettings).mockResolvedValueOnce({
+      success: false,
+      error: 'Location save failed',
+    })
+
+    const { result } = renderHook(() => useNotificationSettings())
+    await act(async () => {})
+
+    await act(async () => { await result.current.saveAlertLocation(10.5, -74.0) })
+
+    expect(result.current.error).toBe('Location save failed')
+    expect(result.current.settings?.notification_lat).toBeNull()
+  })
+
+  it('toggleOptIn returns early when user is not authenticated', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: null } })
+
+    const { result } = renderHook(() => useNotificationSettings())
+    await act(async () => {})
+
+    mockGetUser.mockResolvedValueOnce({ data: { user: null } })
+    await act(async () => { await result.current.toggleOptIn() })
+
+    expect(vi.mocked(updateNotificationSettings)).not.toHaveBeenCalled()
+  })
+
+  it('saveAlertLocation returns early when user is not authenticated', async () => {
+    const { result } = renderHook(() => useNotificationSettings())
+    await act(async () => {})
+
+    mockGetUser.mockResolvedValueOnce({ data: { user: null } })
+    await act(async () => { await result.current.saveAlertLocation(10.5, -74.0) })
+
+    expect(vi.mocked(updateNotificationSettings)).not.toHaveBeenCalled()
+    expect(result.current.isSaving).toBe(false)
+  })
+
+  it('saveAlertRadius returns early when user is not authenticated', async () => {
+    const { result } = renderHook(() => useNotificationSettings())
+    await act(async () => {})
+
+    mockGetUser.mockResolvedValueOnce({ data: { user: null } })
+    await act(async () => { await result.current.saveAlertRadius(10) })
+
+    expect(vi.mocked(updateNotificationSettings)).not.toHaveBeenCalled()
+    expect(result.current.settings?.alert_radius_km).toBe(5)
+  })
 })
