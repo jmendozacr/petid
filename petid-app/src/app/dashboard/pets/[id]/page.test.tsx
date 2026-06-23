@@ -17,7 +17,7 @@ vi.mock('@/stores/pet-store', () => ({
 }))
 
 vi.mock('@/components/qr-code', () => ({
-  QRCode: () => null,
+  QRCode: vi.fn(() => null),
   getPublicPetUrl: () => 'https://petid.app/p/pet-1',
   downloadQRCode: vi.fn(),
   sanitizePetName: (n: string) => n,
@@ -29,7 +29,10 @@ vi.mock('@/components/pet/lost-pet-toggle-button', () => ({
 
 import { usePet } from '@/hooks/usePet'
 import { useHealthRecords } from '@/hooks/useHealthRecords'
+import { downloadQRCode } from '@/components/qr-code'
 import PetDetailPage from './page'
+
+const mockDownloadQRCode = vi.mocked(downloadQRCode)
 
 const emptyRecords = {
   vaccines: [] as [],
@@ -207,5 +210,67 @@ describe('PetDetailPage — loaded state', () => {
     render(<PetDetailPage />)
 
     expect(screen.getByText(enMessages.petDetail.notFound)).toBeInTheDocument()
+  })
+})
+
+describe('PetDetailPage — QR download', () => {
+  const mockPet = {
+    id: 'pet-1',
+    user_id: 'user-1',
+    name: 'Rex',
+    species: 'Dog',
+    breed: null,
+    birthdate: null,
+    color: null,
+    weight: null,
+    microchip_id: null,
+    photo_url: null,
+    owner_phone: null,
+    emergency_contact: null,
+    is_lost: false,
+    lost_since: null,
+    lost_lat: null,
+    lost_lng: null,
+    created_at: '2024-01-01T00:00:00Z',
+  }
+
+  beforeEach(() => {
+    vi.mocked(usePet).mockReturnValue({
+      pet: mockPet,
+      loading: false,
+      error: null,
+      remove: vi.fn(),
+      uploadPhoto: vi.fn(),
+      applyUpdate: vi.fn(),
+    })
+    vi.mocked(useHealthRecords).mockReturnValue({
+      vaccines: [],
+      allergies: [],
+      medicalNotes: [],
+      add: vi.fn(),
+      remove: vi.fn(),
+      loading: false,
+    })
+    mockDownloadQRCode.mockReset()
+  })
+
+  // REQ-05 / REQ-07
+  it('download uses pet-tag preset by default', async () => {
+    mockDownloadQRCode.mockResolvedValue(undefined)
+    render(<PetDetailPage />)
+    fireEvent.click(screen.getByRole('button', { name: /download/i }))
+    await vi.waitFor(() => {
+      expect(mockDownloadQRCode).toHaveBeenCalledWith('pet-1', 'Rex')
+    })
+  })
+
+  // REQ-08.1
+  it('shows error toast when download fails', async () => {
+    mockDownloadQRCode.mockRejectedValue(new Error('Download failed'))
+    render(<PetDetailPage />)
+    fireEvent.click(screen.getByRole('button', { name: /download/i }))
+    await vi.waitFor(() => {
+      expect(mockDownloadQRCode).toHaveBeenCalled()
+    })
   })
 })

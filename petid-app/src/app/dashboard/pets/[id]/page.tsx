@@ -238,7 +238,7 @@ export default function PetDetailPage() {
           <CardDescription>{t('qrSubtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center">
-          <QRCode value={getPublicPetUrl(petId)} size={200} className="mb-4" />
+          <QRCode value={getPublicPetUrl(petId)} preset="pet-tag" size={200} className="mb-4" />
           <p className="text-sm text-muted-foreground text-center">
             {getPublicPetUrl(petId)}
           </p>

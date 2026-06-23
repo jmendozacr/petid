@@ -1,7 +1,49 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import QRCodeLib from 'qrcode'
+import { useEffect, useRef } from 'react'
+import QRCodeStyling from 'qr-code-styling'
+
+export type QRPreset = 'pet-tag' | 'premium' | 'fresh'
+
+const PAW_IMAGE =
+  `data:image/svg+xml,` +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">` +
+      `<ellipse cx="50" cy="68" rx="24" ry="20"/>` +
+      `<ellipse cx="22" cy="48" rx="11" ry="14"/>` +
+      `<ellipse cx="40" cy="35" rx="11" ry="14"/>` +
+      `<ellipse cx="61" cy="35" rx="11" ry="14"/>` +
+      `<ellipse cx="78" cy="48" rx="11" ry="14"/>` +
+      `</svg>`,
+  )
+
+type PresetConfig = {
+  dotsOptions: { type: string; color: string }
+  cornersSquareOptions: { type: string; color: string }
+  cornersDotOptions: { type: string; color: string }
+  backgroundOptions: { color: string }
+}
+
+export const QR_PRESETS: Record<QRPreset, PresetConfig> = {
+  'pet-tag': {
+    dotsOptions: { type: 'rounded', color: '#FF8C42' },
+    cornersSquareOptions: { type: 'extra-rounded', color: '#C45E1A' },
+    cornersDotOptions: { type: 'dot', color: '#FF8C42' },
+    backgroundOptions: { color: '#FFF8F0' },
+  },
+  premium: {
+    dotsOptions: { type: 'dots', color: '#FFFFFF' },
+    cornersSquareOptions: { type: 'square', color: '#FFFFFF' },
+    cornersDotOptions: { type: 'dot', color: '#60A5FA' },
+    backgroundOptions: { color: '#1A1A2E' },
+  },
+  fresh: {
+    dotsOptions: { type: 'classy-rounded', color: '#2D9B83' },
+    cornersSquareOptions: { type: 'extra-rounded', color: '#1B6B5A' },
+    cornersDotOptions: { type: 'dot', color: '#2D9B83' },
+    backgroundOptions: { color: '#FFFFFF' },
+  },
+}
 
 export function sanitizePetName(name: string): string {
   const result = name
@@ -16,68 +58,58 @@ export function sanitizePetName(name: string): string {
   return result.length === 0 ? 'pet' : result
 }
 
-export async function downloadQRCode(petId: string, petName: string): Promise<void> {
-  const qrValue = getPublicPetUrl(petId)
-  const dataUrl = await QRCodeLib.toDataURL(qrValue, {
-    type: 'image/png',
+export async function downloadQRCode(
+  petId: string,
+  petName: string,
+  preset: QRPreset = 'pet-tag',
+): Promise<void> {
+  const qr = new QRCodeStyling({
     width: 600,
-    margin: 2,
-    color: { dark: '#000000', light: '#ffffff' },
+    height: 600,
+    data: getPublicPetUrl(petId),
+    image: PAW_IMAGE,
+    imageOptions: { imageSize: 0.3, margin: 5, hideBackgroundDots: true },
+    qrOptions: { errorCorrectionLevel: 'H' },
+    ...QR_PRESETS[preset],
   })
-  const base64 = dataUrl.split(',')[1]
-  const binary = atob(base64)
-  const uint8 = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) uint8[i] = binary.charCodeAt(i)
-  const blob = new Blob([uint8], { type: 'image/png' })
-  const objectUrl = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-  anchor.href = objectUrl
-  anchor.download = `${sanitizePetName(petName)}-qrcode.png`
-  anchor.style.display = 'none'
-  document.body.appendChild(anchor)
-  anchor.click()
-  document.body.removeChild(anchor)
-  URL.revokeObjectURL(objectUrl)
+  await qr.download({ name: `${sanitizePetName(petName)}-qrcode`, extension: 'png' })
 }
 
-interface QRCodeProps {
+export interface QRCodeProps {
   value: string
+  preset?: QRPreset
   size?: number
   className?: string
 }
 
-export function QRCode({ value, size = 200, className }: QRCodeProps) {
-  const [dataUrl, setDataUrl] = useState<string | null>(null)
+export function QRCode({ value, preset = 'pet-tag', size = 200, className }: QRCodeProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const qrRef = useRef<QRCodeStyling | null>(null)
 
   useEffect(() => {
-    async function generateQR() {
-      const url = await QRCodeLib.toDataURL(value, {
-        width: size,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#ffffff',
-        },
-      })
-      setDataUrl(url)
-    }
-    generateQR()
-  }, [value, size])
+    const qr = new QRCodeStyling({
+      width: size,
+      height: size,
+      data: value,
+      image: PAW_IMAGE,
+      imageOptions: { imageSize: 0.3, margin: 5, hideBackgroundDots: true },
+      qrOptions: { errorCorrectionLevel: 'H' },
+      ...QR_PRESETS[preset],
+    })
+    qr.append(containerRef.current!)
+    qrRef.current = qr
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!dataUrl) {
-    return <div className={`bg-muted ${className}`} style={{ width: size, height: size }} />
-  }
+  useEffect(() => {
+    qrRef.current?.update({
+      width: size,
+      height: size,
+      data: value,
+      ...QR_PRESETS[preset],
+    })
+  }, [value, preset, size])
 
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={dataUrl}
-      alt={`QR code for ${value}`}
-      className={className}
-      width={size}
-      height={size}
-    />
-  )
+  return <div ref={containerRef} className={className} />
 }
 
 export function getPublicPetUrl(petId: string): string {
