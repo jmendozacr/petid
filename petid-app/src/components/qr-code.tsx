@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import QRCodeStyling from 'qr-code-styling'
+import type { DotType, CornerSquareType, CornerDotType } from 'qr-code-styling'
 
 export type QRPreset = 'pet-tag' | 'premium' | 'fresh'
 
@@ -18,9 +19,9 @@ const PAW_IMAGE =
   )
 
 type PresetConfig = {
-  dotsOptions: { type: string; color: string }
-  cornersSquareOptions: { type: string; color: string }
-  cornersDotOptions: { type: string; color: string }
+  dotsOptions: { type: DotType; color: string }
+  cornersSquareOptions: { type: CornerSquareType; color: string }
+  cornersDotOptions: { type: CornerDotType; color: string }
   backgroundOptions: { color: string }
 }
 
